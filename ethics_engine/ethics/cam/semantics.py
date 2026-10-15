@@ -368,9 +368,7 @@ class CausalModel(CausalNetwork):
         if isinstance(f, Means):
             for i in self.get_all_actions()+self.get_direct_consequences():
                 for g in self.get_actual_goals():
-                    print(f"Checking if {i} causes {g} and affects {f.f1}")
                     if self.models(And(Causes(i, g), Affects(i, f.f1))):
-                        print(f"Means: {i} causes {g} and affects {f.f1}")
                         return True
             return False
         if isinstance(f, Means2):
