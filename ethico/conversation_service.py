@@ -1,11 +1,4 @@
-"""Supabase data access for the current single-chat UI.
-
-Every client passed here must be authenticated as the current user.
-Database Row Level Security is the final ownership check.
-"""
-
 from typing import Any
-
 from supabase import Client
 
 
@@ -31,8 +24,8 @@ def create_conversation(client: Client, user_id: str, title: str) -> str:
 def save_message(
     client: Client, conversation_id: str, role: str, content: str
 ) -> str:
-    if role not in {"user", "assistant"}:
-        raise ValueError("Only user and assistant messages are stored.")
+    if role not in {"user", "assistant", "system"}:
+        raise ValueError("Unsupported message role.")
     return _insert_id(client, "messages", {
         "conversation_id": conversation_id,
         "role": role,
@@ -40,45 +33,34 @@ def save_message(
     })
 
 
+def _update_conversation(
+    client: Client, conversation_id: str, payload: dict[str, Any]
+) -> None:
+    response = (
+        client.table("conversations")
+        .update(payload)
+        .eq("id", conversation_id)
+        .select("id")
+        .execute()
+    )
+    if not response.data:
+        raise RuntimeError("Could not update the conversation.")
+
+
 def save_situation(
     client: Client, conversation_id: str, situation: dict[str, Any]
-) -> str:
-    """Start a NEW evaluation run; prior runs are never updated."""
-    return _insert_id(client, "evaluation_runs", {
-        "conversation_id": conversation_id,
-        "situation": situation,
-        "status": "situation_saved",
+) -> None:
+    """Save the latest formulation and clear any older evaluation."""
+    _update_conversation(client, conversation_id, {
+        "dilemma": situation,
+        "evaluation": None,
     })
 
 
 def save_evaluation(
-    client: Client, run_id: str, evaluation: dict[str, Any]
+    client: Client, conversation_id: str, evaluation: dict[str, Any]
 ) -> None:
-    """Complete the specific run associated with this situation."""
-    result = (
-        client.table("evaluation_runs")
-        .update({
-            "evaluation": evaluation,
-            "status": "completed",
-        })
-        .eq("id", run_id)
-        .select("id")
-        .execute()
-    )
-    if not result.data:
-        raise RuntimeError("Could not update the evaluation run.")
-
-
-def mark_evaluation_failed(client: Client, run_id: str, reason: str) -> None:
-    result = (
-        client.table("evaluation_runs")
-        .update({
-            "status": "failed",
-            "error": reason[:500],
-        })
-        .eq("id", run_id)
-        .select("id")
-        .execute()
-    )
-    if not result.data:
-        raise RuntimeError("Could not mark the evaluation as failed.")
+    """Save the evaluation directly on its conversation."""
+    _update_conversation(client, conversation_id, {
+        "evaluation": evaluation,
+    })

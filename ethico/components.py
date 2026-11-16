@@ -105,7 +105,7 @@ def chat() -> rx.Component:
     return rx.box(
         rx.auto_scroll(
             rx.cond(
-                State.chat_history.length() == 0, # type: ignore
+                State.chat_history.length() == 0,
                 rx.box(
                     rx.markdown(INTRO_MESSAGE),
                     **style.intro_message,

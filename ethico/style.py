@@ -67,7 +67,7 @@ input_style = dict(width="100%", min_width="0", flex="1", height=CONTROL_HEIGHT,
     **{"& input": {"padding": "0 12px", "font_size": "15px", "border": "none",
                    "outline": "none", "box_shadow": "none", "background": "transparent"},
        "& input::placeholder": {"color": MUTED},
-       "&:focus-within": {"box_shadow": "none"}})
+       "&:focus-within": {"outline": "none", "box_shadow": "none", "background": "transparent"}})
 button_style = dict(flex_shrink="0", width="38px", height="38px", padding="0",
     border_radius="12px", background_color=TEXT, color=BG, cursor="pointer",
     _hover={"opacity": "0.8"}, _disabled={"opacity": "0.4", "cursor": "not-allowed"})

@@ -13,7 +13,6 @@ from ethico.auth_state import AuthState
 from ethico.constants import EXPLAIN_PROMPT, OPENAI_TOOLS, SYSTEM_PROMPT
 from ethico.conversation_service import (
     create_conversation,
-    mark_evaluation_failed,
     save_evaluation,
     save_message,
     save_situation,
@@ -33,8 +32,6 @@ class State(rx.State):
     processing: bool = False
     error: str = ""
 
-    # One database conversation for the current visible chat.
-    # Never restored automatically after login/restart.
     conversation_id: str = ""
 
     # Incremented on login/logout so an old streaming event cannot
@@ -61,11 +58,10 @@ class State(rx.State):
             if not question or self.processing:
                 return
 
-            # Authorization is enforced in the backend event itself.
             auth = await self.get_state(AuthState)
             try:
                 supabase = auth._authenticated_client()
-                user_id = auth.user_id  # Derived from Supabase get_user().
+                user_id = auth.user_id  
             except Exception:
                 logger.warning("Rejected unauthenticated chat event", exc_info=True)
                 self.error = "Please log in before using the chat."
@@ -90,7 +86,6 @@ class State(rx.State):
         answer_parts: list[str] = []
 
         try:
-            # The first sent message starts a new DB conversation.
             if not conversation_id:
                 conversation_id = await asyncio.to_thread(
                     create_conversation, supabase, user_id, question[:80]
@@ -105,8 +100,7 @@ class State(rx.State):
                 if self.chat_generation != generation:
                     return
 
-            # Persist before calling OpenAI, so a failed generation
-            # does not lose the user's submitted message.
+            
             await asyncio.to_thread(
                 save_message, supabase, conversation_id, "user", question
             )
@@ -120,35 +114,20 @@ class State(rx.State):
                     with open(situation_path, encoding="utf-8") as f:
                         situation = json.load(f)
 
-                    # Save situation.json NOW, before HERA starts.
-                    # Each evaluate command creates a fresh run.
-                    run_id = await asyncio.to_thread(
+                    await asyncio.to_thread(
                         save_situation, supabase, conversation_id, situation
                     )
 
-                    try:
-                        # HERA is synchronous; avoid blocking the event loop.
-                        await asyncio.to_thread(
-                            evaluate_dilemma,
-                            situation_path,
-                            str(evaluation_path),
-                        )
-                        with open(evaluation_path, encoding="utf-8") as f:
-                            evaluation = json.load(f)
-                    except Exception as exc:
-                        try:
-                            await asyncio.to_thread(
-                                mark_evaluation_failed,
-                                supabase,
-                                run_id,
-                                f"{type(exc).__name__}: {exc}",
-                            )
-                        except Exception:
-                            logger.exception("Could not mark evaluation run as failed")
-                        raise
+                    await asyncio.to_thread(
+                        evaluate_dilemma,
+                        situation_path,
+                        str(evaluation_path),
+                    )
+                    with open(evaluation_path, encoding="utf-8") as f:
+                        evaluation = json.load(f)
 
                     await asyncio.to_thread(
-                        save_evaluation, supabase, run_id, evaluation
+                        save_evaluation, supabase, conversation_id, evaluation
                     )
                     messages.append({
                         "role": "system",
@@ -183,7 +162,6 @@ class State(rx.State):
                 if self.chat_generation != generation:
                     return
 
-            # Store one assistant message after the streamed answer completes.
             if answer_parts:
                 await asyncio.to_thread(
                     save_message,
@@ -205,11 +183,9 @@ class State(rx.State):
                 if self.chat_generation == generation:
                     self.error = "Could not process or save this message. Check the server logs."
                     if not user_saved:
-                        # Do not display a message that was never saved.
                         self.chat_history.pop()
                         self.question = question
         finally:
-            # If streaming failed halfway, retain the partial assistant answer.
             if user_saved and answer_parts and not assistant_saved:
                 async with self:
                     same_chat = self.chat_generation == generation
