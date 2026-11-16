@@ -1,0 +1,17 @@
+{
+  "action": "suppress",
+  "kantian_humanity_principle": {
+    "permissible": false,
+    "principle": "KantianHumanityPrincipleReading1",
+    "sufficient": "{And(Means('consumers'), Not(End('consumers')))}",
+    "necessary": "{Or(Means('consumers'), Not(End('shareholders'))), Means('consumers'), Or(Or(Means('employees'), Not(End('consumers'))), Not(End('shareholders'))), Or(Not(End('consumers')), Not(End('shareholders'))), Or(Means('employees'), Means('consumers')), Not(End('consumers')), Or(Means('employees'), Not(End('consumers'))), Or(Or(Means('employees'), Means('consumers')), Not(End('shareholders')))}",
+    "inus": "{Means('consumers'), Not(End('consumers'))}"
+  },
+  "utilitarian_principle": {
+    "permissible": false,
+    "principle": "Utilitarianism",
+    "sufficient": "{Not(GEq(U(And(And(And('drug_released', 'jobs_saved'), 'consumers_die'), 'company_ruined')), U(And(And(And(Not('drug_released'), Not('jobs_saved')), Not('consumers_die')), Not('company_ruined')))))}",
+    "necessary": "{Not(GEq(U(And(And(And('drug_released', 'jobs_saved'), 'consumers_die'), 'company_ruined')), U(And(And(And(Not('drug_released'), Not('jobs_saved')), Not('consumers_die')), Not('company_ruined')))))}",
+    "inus": "{Not(GEq(U(And(And(And('drug_released', 'jobs_saved'), 'consumers_die'), 'company_ruined')), U(And(And(And(Not('drug_released'), Not('jobs_saved')), Not('consumers_die')), Not('company_ruined')))))}"
+  }
+}

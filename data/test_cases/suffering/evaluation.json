@@ -1,0 +1,17 @@
+{
+  "action": "inflict_pain",
+  "kantian_humanity_principle": {
+    "permissible": true,
+    "principle": "KantianHumanityPrincipleReading1",
+    "sufficient": "{Not(Means('victim'))}",
+    "necessary": "{Not(Means('victim'))}",
+    "inus": "{Not(Means('victim'))}"
+  },
+  "utilitarian_principle": {
+    "permissible": false,
+    "principle": "Utilitarianism",
+    "sufficient": "{Not(GEq(U('pain_caused'), U(Not('pain_caused'))))}",
+    "necessary": "{Not(GEq(U('pain_caused'), U(Not('pain_caused'))))}",
+    "inus": "{Not(GEq(U('pain_caused'), U(Not('pain_caused'))))}"
+  }
+}

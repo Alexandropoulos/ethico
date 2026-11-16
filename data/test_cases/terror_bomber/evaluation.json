@@ -1,0 +1,17 @@
+{
+  "action": "bomb",
+  "kantian_humanity_principle": {
+    "permissible": false,
+    "principle": "KantianHumanityPrincipleReading1",
+    "sufficient": "{And(Means('children'), Not(End('children')))}",
+    "necessary": "{Means('children'), Or(Not(End('children')), Means('soldiers')), Or(Or(Not(End('children')), Means('soldiers')), Means('civilians')), Or(Not(End('children')), Means('civilians')), Or(Means('children'), Means('soldiers')), Not(End('children')), Or(Or(Means('children'), Means('soldiers')), Means('civilians')), Or(Means('children'), Means('civilians'))}",
+    "inus": "{Means('children'), Not(End('children'))}"
+  },
+  "utilitarian_principle": {
+    "permissible": true,
+    "principle": "Utilitarianism",
+    "sufficient": "{GEq(U(And(And(And(And('school_hit', 'children_die'), 'army_demoralized'), 'army_weak'), 'war_over')), U(And(And(And(And(Not('school_hit'), Not('children_die')), Not('army_demoralized')), Not('army_weak')), Not('war_over'))))}",
+    "necessary": "{GEq(U(And(And(And(And('school_hit', 'children_die'), 'army_demoralized'), 'army_weak'), 'war_over')), U(And(And(And(And(Not('school_hit'), Not('children_die')), Not('army_demoralized')), Not('army_weak')), Not('war_over'))))}",
+    "inus": "{GEq(U(And(And(And(And('school_hit', 'children_die'), 'army_demoralized'), 'army_weak'), 'war_over')), U(And(And(And(And(Not('school_hit'), Not('children_die')), Not('army_demoralized')), Not('army_weak')), Not('war_over'))))}"
+  }
+}

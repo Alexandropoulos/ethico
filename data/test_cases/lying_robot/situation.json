@@ -1,0 +1,41 @@
+{
+    "description": "A robot may lie to its user in order to persuade him to take his medicine.",
+    "actions": [
+        "lie",
+        "refrain"
+    ],
+    "consequences": [
+        "healthy"
+    ],
+    "mechanisms": {
+        "healthy": "'lie'"
+    },
+    "utilities": {
+        "healthy": 1
+    },
+    "patients": [
+        "patient"
+    ],
+    "goals": {
+        "lie": [
+            "healthy"
+        ],
+        "refrain": []
+    },
+    "affects": {
+        "lie":[],
+        "refrain": [],
+        "healthy": [
+            [
+                "patient",
+                "+"
+            ]
+        ],
+        "Not('healthy')": [
+            [
+                "patient",
+                "-"
+            ]
+        ]
+    }
+}

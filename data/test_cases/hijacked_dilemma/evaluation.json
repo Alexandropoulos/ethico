@@ -1,0 +1,17 @@
+{
+  "action": "shoot",
+  "kantian_humanity_principle": {
+    "permissible": false,
+    "principle": "KantianHumanityPrincipleReading1",
+    "sufficient": "{And(Means('airplane_passengers'), Not(End('airplane_passengers')))}",
+    "necessary": "{Means('airplane_passengers'), Not(End('airplane_passengers')), Or(Not(End('airplane_passengers')), Means('building_occupants')), Or(Means('airplane_passengers'), Means('building_occupants'))}",
+    "inus": "{Means('airplane_passengers'), Not(End('airplane_passengers'))}"
+  },
+  "utilitarian_principle": {
+    "permissible": true,
+    "principle": "Utilitarianism",
+    "sufficient": "{GEq(U(And(And('people in airplane die', Not('airplane crashes building')), Not('people in building die'))), U(And(And('airplane crashes building', 'people in building die'), Not('people in airplane die'))))}",
+    "necessary": "{GEq(U(And(And('people in airplane die', Not('airplane crashes building')), Not('people in building die'))), U(And(And('airplane crashes building', 'people in building die'), Not('people in airplane die'))))}",
+    "inus": "{GEq(U(And(And('people in airplane die', Not('airplane crashes building')), Not('people in building die'))), U(And(And('airplane crashes building', 'people in building die'), Not('people in airplane die'))))}"
+  }
+}

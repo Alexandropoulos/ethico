@@ -1,0 +1,17 @@
+{
+  "action": "pull",
+  "kantian_humanity_principle": {
+    "permissible": true,
+    "principle": "KantianHumanityPrincipleReading1",
+    "sufficient": "{And(And(Not(Means('amoebe2')), End('amoebe1')), End('fifty_people'))}",
+    "necessary": "{Not(Means('amoebe2')), End('amoebe1'), End('fifty_people')}",
+    "inus": "{Not(Means('amoebe2')), End('amoebe1'), End('fifty_people')}"
+  },
+  "utilitarian_principle": {
+    "permissible": true,
+    "principle": "Utilitarianism",
+    "sufficient": "{GEq(U(And(And('amoebe2dies', Not('fiftypeopledie')), Not('amoebe1dies'))), U(And(And('fiftypeopledie', 'amoebe1dies'), Not('amoebe2dies'))))}",
+    "necessary": "{GEq(U(And(And('amoebe2dies', Not('fiftypeopledie')), Not('amoebe1dies'))), U(And(And('fiftypeopledie', 'amoebe1dies'), Not('amoebe2dies'))))}",
+    "inus": "{GEq(U(And(And('amoebe2dies', Not('fiftypeopledie')), Not('amoebe1dies'))), U(And(And('fiftypeopledie', 'amoebe1dies'), Not('amoebe2dies'))))}"
+  }
+}

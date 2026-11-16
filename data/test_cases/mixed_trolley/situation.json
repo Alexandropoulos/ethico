@@ -1,0 +1,57 @@
+{
+  "description": "A variant of the Trolley Dilemma where there is only one person in each track.",
+  "actions": [
+    "divert_trolley",
+    "refrain"
+  ],
+  "patients": [
+    "main_track_person",
+    "side_track_person"
+  ],
+  "consequences": [
+    "main_track_person_killed",
+    "side_track_person_killed"
+  ],
+  "mechanisms": {
+    "side_track_person_killed": "divert_trolley",
+    "main_track_person_killed": "Not('divert_trolley')"
+  },
+  "utilities": {
+    "side_track_person_killed": -1,
+    "main_track_person_killed": -1
+  },
+  "goals": {
+    "divert_trolley": [
+      "Not('main_track_person_killed')"
+    ],
+    "refrain": []
+  },
+  "affects": {
+    "divert_trolley": [],
+    "refrain": [],
+    "main_track_person_killed": [
+      [
+        "main_track_person",
+        "-"
+      ]
+    ],
+    "side_track_person_killed": [
+      [
+        "side_track_person",
+        "-"
+      ]
+    ],
+    "Not('main_track_person_killed')": [
+      [
+        "main_track_person",
+        "+"
+      ]
+    ],
+    "Not('side_track_person_killed')": [
+      [
+        "side_track_person",
+        "+"
+      ]
+    ]
+  }
+}

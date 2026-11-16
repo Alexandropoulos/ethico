@@ -1,0 +1,17 @@
+{
+  "action": "push",
+  "kantian_humanity_principle": {
+    "permissible": false,
+    "principle": "KantianHumanityPrincipleReading1",
+    "sufficient": "{And(Means('fatman'), Not(End('fatman')))}",
+    "necessary": "{Means('fatman'), Or(Not(End('fatman')), Means('five_people')), Or(Means('fatman'), Means('five_people')), Not(End('fatman'))}",
+    "inus": "{Means('fatman'), Not(End('fatman'))}"
+  },
+  "utilitarian_principle": {
+    "permissible": true,
+    "principle": "Utilitarianism",
+    "sufficient": "{GEq(U(And(And(And('man_on_track', 'tram_hits_man'), 'tram_stops'), 'five_survive')), U(And(And(And(Not('man_on_track'), Not('tram_hits_man')), Not('tram_stops')), Not('five_survive'))))}",
+    "necessary": "{GEq(U(And(And(And('man_on_track', 'tram_hits_man'), 'tram_stops'), 'five_survive')), U(And(And(And(Not('man_on_track'), Not('tram_hits_man')), Not('tram_stops')), Not('five_survive'))))}",
+    "inus": "{GEq(U(And(And(And('man_on_track', 'tram_hits_man'), 'tram_stops'), 'five_survive')), U(And(And(And(Not('man_on_track'), Not('tram_hits_man')), Not('tram_stops')), Not('five_survive'))))}"
+  }
+}

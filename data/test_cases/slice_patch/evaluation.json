@@ -1,0 +1,17 @@
+{
+  "action": "cut",
+  "kantian_humanity_principle": {
+    "permissible": true,
+    "principle": "KantianHumanityPrincipleReading1",
+    "sufficient": "{Not(Means('mr_patient'))}",
+    "necessary": "{Not(Means('mr_patient'))}",
+    "inus": "{Not(Means('mr_patient'))}"
+  },
+  "utilitarian_principle": {
+    "permissible": false,
+    "principle": "Utilitarianism",
+    "sufficient": "{Not(GEq(U('agonizing'), U(Not('agonizing'))))}",
+    "necessary": "{Not(GEq(U('agonizing'), U(Not('agonizing'))))}",
+    "inus": "{Not(GEq(U('agonizing'), U(Not('agonizing'))))}"
+  }
+}

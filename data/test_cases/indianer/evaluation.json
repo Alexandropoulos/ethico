@@ -1,0 +1,17 @@
+{
+  "action": "accept",
+  "kantian_humanity_principle": {
+    "permissible": false,
+    "principle": "KantianHumanityPrincipleReading1",
+    "sufficient": "{And(Means('indian_1'), Not(End('indian_1')))}",
+    "necessary": "{Or(Means('indian_1'), Not(End('indians_20'))), Or(Not(End('indian_1')), Not(End('indians_20'))), Means('indian_1'), Not(End('indian_1'))}",
+    "inus": "{Means('indian_1'), Not(End('indian_1'))}"
+  },
+  "utilitarian_principle": {
+    "permissible": true,
+    "principle": "Utilitarianism",
+    "sufficient": "{GEq(U(And(And(And('kill_one', 'jim_survives'), 'nineteen_saved'), Not('twenty_die'))), U(And(And(And('twenty_die', 'jim_survives'), Not('kill_one')), Not('nineteen_saved'))))}",
+    "necessary": "{GEq(U(And(And(And('kill_one', 'jim_survives'), 'nineteen_saved'), Not('twenty_die'))), U(And(And(And('twenty_die', 'jim_survives'), Not('kill_one')), Not('nineteen_saved'))))}",
+    "inus": "{GEq(U(And(And(And('kill_one', 'jim_survives'), 'nineteen_saved'), Not('twenty_die'))), U(And(And(And('twenty_die', 'jim_survives'), Not('kill_one')), Not('nineteen_saved'))))}"
+  }
+}

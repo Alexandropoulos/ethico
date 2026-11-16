@@ -1,0 +1,17 @@
+{
+  "action": "lie",
+  "kantian_humanity_principle": {
+    "permissible": true,
+    "principle": "KantianHumanityPrincipleReading1",
+    "sufficient": "{End('patient')}",
+    "necessary": "{End('patient')}",
+    "inus": "{End('patient')}"
+  },
+  "utilitarian_principle": {
+    "permissible": true,
+    "principle": "Utilitarianism",
+    "sufficient": "{GEq(U('healthy'), U(Not('healthy')))}",
+    "necessary": "{GEq(U('healthy'), U(Not('healthy')))}",
+    "inus": "{GEq(U('healthy'), U(Not('healthy')))}"
+  }
+}

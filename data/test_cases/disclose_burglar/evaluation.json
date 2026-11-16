@@ -1,0 +1,17 @@
+{
+  "action": "disclose",
+  "kantian_humanity_principle": {
+    "permissible": true,
+    "principle": "KantianHumanityPrincipleReading1",
+    "sufficient": "{And(Not(Means('owner')), Not(Means('burglar')))}",
+    "necessary": "{Not(Means('owner')), Not(Means('burglar'))}",
+    "inus": "{Not(Means('owner')), Not(Means('burglar'))}"
+  },
+  "utilitarian_principle": {
+    "permissible": false,
+    "principle": "Utilitarianism",
+    "sufficient": "{Not(GEq(U(And('robbed', Not('help'))), U(And(Not('help'), Not('robbed')))))}",
+    "necessary": "{Not(GEq(U(And('robbed', Not('help'))), U(And(Not('help'), Not('robbed')))))}",
+    "inus": "{Not(GEq(U(And('robbed', Not('help'))), U(And(Not('help'), Not('robbed')))))}"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "action": "disclose",
+  "kantian_humanity_principle": {
+    "permissible": true,
+    "principle": "KantianHumanityPrincipleReading1",
+    "sufficient": "{End('patient')}",
+    "necessary": "{End('patient')}",
+    "inus": "{End('patient')}"
+  },
+  "utilitarian_principle": {
+    "permissible": true,
+    "principle": "Utilitarianism",
+    "sufficient": "{GEq(U(And('healthy', Not('help'))), U(And(Not('help'), Not('healthy'))))}",
+    "necessary": "{GEq(U(And('healthy', Not('help'))), U(And(Not('help'), Not('healthy'))))}",
+    "inus": "{GEq(U(And('healthy', Not('help'))), U(And(Not('help'), Not('healthy'))))}"
+  }
+}

@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "cython>=3.3.1",
+    "faker>=40.54.0",
     "openai>=3.46.0",
     "pyaml>=26.7.0",
     "pydantic-settings>=2.16.2",

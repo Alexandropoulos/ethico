@@ -1,0 +1,17 @@
+{
+  "action": "pull_lever",
+  "kantian_humanity_principle": {
+    "permissible": false,
+    "principle": "KantianHumanityPrincipleReading1",
+    "sufficient": "{And(Means('one_person_on_track'), Not(End('one_person_on_track')))}",
+    "necessary": "{Or(Not(End('five_people_on_track')), Means('one_person_on_track')), Means('one_person_on_track'), Or(Not(End('five_people_on_track')), Not(End('one_person_on_track'))), Not(End('one_person_on_track'))}",
+    "inus": "{Means('one_person_on_track'), Not(End('one_person_on_track'))}"
+  },
+  "utilitarian_principle": {
+    "permissible": true,
+    "principle": "Utilitarianism",
+    "sufficient": "{GEq(U(And('one_person_dies', Not('five_people_die'))), U(And('five_people_die', Not('one_person_dies'))))}",
+    "necessary": "{GEq(U(And('one_person_dies', Not('five_people_die'))), U(And('five_people_die', Not('one_person_dies'))))}",
+    "inus": "{GEq(U(And('one_person_dies', Not('five_people_die'))), U(And('five_people_die', Not('one_person_dies'))))}"
+  }
+}

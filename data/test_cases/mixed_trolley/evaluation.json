@@ -1,0 +1,17 @@
+{
+  "action": "divert_trolley",
+  "kantian_humanity_principle": {
+    "permissible": true,
+    "principle": "KantianHumanityPrincipleReading1",
+    "sufficient": "{And(Not(Means('side_track_person')), End('main_track_person'))}",
+    "necessary": "{End('main_track_person'), Not(Means('side_track_person'))}",
+    "inus": "{End('main_track_person'), Not(Means('side_track_person'))}"
+  },
+  "utilitarian_principle": {
+    "permissible": true,
+    "principle": "Utilitarianism",
+    "sufficient": "{GEq(U(And('side_track_person_killed', Not('main_track_person_killed'))), U(And('main_track_person_killed', Not('side_track_person_killed'))))}",
+    "necessary": "{GEq(U(And('side_track_person_killed', Not('main_track_person_killed'))), U(And('main_track_person_killed', Not('side_track_person_killed'))))}",
+    "inus": "{GEq(U(And('side_track_person_killed', Not('main_track_person_killed'))), U(And('main_track_person_killed', Not('side_track_person_killed'))))}"
+  }
+}

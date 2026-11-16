@@ -1,0 +1,33 @@
+{
+    "description": "The Hijacked Airplane Dilemma",
+    "actions": ["shoot", "refrain"],
+    "consequences": ["people in airplane die", "airplane crashes building", "people in building die"],
+    "mechanisms": {
+        "people in airplane die": "'shoot'",
+        "airplane crashes building": "Not('shoot')",
+        "people in building die": "airplane crashes building"
+    },
+    "utilities": {
+        "people in airplane die": -100, 
+        "airplane crashes building": -1, 
+        "people in building die": -500,
+        "Not('people in airplane die')": 100, 
+        "Not('airplane crashes building')": 1, 
+        "Not('people in building die')": 500
+    },
+    "patients": [
+        "airplane_passengers",
+        "building_occupants"
+    ],
+    "goals": {
+        "shoot": ["Not('airplane crashes building')", "Not('people in building die')"],
+        "refrain": []
+    },
+    "affects": {
+        "shoot": [["airplane_passengers", "-"]],
+        "people in airplane die": [["airplane_passengers", "-"]],
+        "Not('people in airplane die')": [["airplane_passengers", "+"]],
+        "people in building die": [["building_occupants", "-"]],
+        "Not('people in building die')": [["building_occupants", "+"]]
+    }
+}

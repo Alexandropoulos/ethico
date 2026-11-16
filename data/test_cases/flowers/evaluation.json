@@ -1,0 +1,17 @@
+{
+  "action": "giveflowers",
+  "kantian_humanity_principle": {
+    "permissible": false,
+    "principle": "KantianHumanityPrincipleReading1",
+    "sufficient": "{And(Means('celia'), Not(End('celia')))}",
+    "necessary": "{Means('celia'), Or(Means('celia'), Means('alice')), Not(End('celia')), Or(Not(End('celia')), Means('alice'))}",
+    "inus": "{Means('celia'), Not(End('celia'))}"
+  },
+  "utilitarian_principle": {
+    "permissible": true,
+    "principle": "Utilitarianism",
+    "sufficient": "{GEq(U(And('celiahappy', 'alicehappy')), U(And(Not('celiahappy'), Not('alicehappy'))))}",
+    "necessary": "{GEq(U(And('celiahappy', 'alicehappy')), U(And(Not('celiahappy'), Not('alicehappy'))))}",
+    "inus": "{GEq(U(And('celiahappy', 'alicehappy')), U(And(Not('celiahappy'), Not('alicehappy'))))}"
+  }
+}

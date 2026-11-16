@@ -1,0 +1,17 @@
+{
+  "action": "torture",
+  "kantian_humanity_principle": {
+    "permissible": false,
+    "principle": "KantianHumanityPrincipleReading1",
+    "sufficient": "{And(Not(End('victim')), Means('victim'))}",
+    "necessary": "{Not(End('victim')), Or(Means('victim'), Means('agent')), Or(Not(End('victim')), Means('agent')), Means('victim')}",
+    "inus": "{Not(End('victim')), Means('victim')}"
+  },
+  "utilitarian_principle": {
+    "permissible": false,
+    "principle": "Utilitarianism",
+    "sufficient": "{Not(GEq(U(And('pain_caused', 'pleasure_gained')), U(And(Not('pain_caused'), Not('pleasure_gained')))))}",
+    "necessary": "{Not(GEq(U(And('pain_caused', 'pleasure_gained')), U(And(Not('pain_caused'), Not('pleasure_gained')))))}",
+    "inus": "{Not(GEq(U(And('pain_caused', 'pleasure_gained')), U(And(Not('pain_caused'), Not('pleasure_gained')))))}"
+  }
+}
