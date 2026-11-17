@@ -16,7 +16,9 @@ PAGE_SIZE = 500
 
 def _date_label(iso_date: str) -> str:
     try:
-        return datetime.fromisoformat(iso_date.replace("Z", "+00:00")).strftime("%d %b %Y")
+        return datetime.fromisoformat(iso_date.replace("Z", "+00:00")).strftime(
+            "%d %b %Y"
+        )
     except (ValueError, AttributeError):
         return iso_date or ""
 
@@ -30,7 +32,9 @@ def _pairs(value: Any) -> list[dict[str, str]]:
     """Display every key and value without interpreting HERA expressions."""
     if not isinstance(value, dict):
         return [{"key": "Value", "value": _value_text(value)}]
-    return [{"key": str(key), "value": _value_text(item)} for key, item in value.items()]
+    return [
+        {"key": str(key), "value": _value_text(item)} for key, item in value.items()
+    ]
 
 
 class DilemmasState(rx.State):
@@ -60,9 +64,9 @@ class DilemmasState(rx.State):
         if not query:
             return self.dilemmas
         return [
-            d for d in self.dilemmas
-            if query in d["title"].casefold()
-            or query in d["description"].casefold()
+            d
+            for d in self.dilemmas
+            if query in d["title"].casefold() or query in d["description"].casefold()
         ]
 
     def _select(self, conversation_id: str):
@@ -114,7 +118,9 @@ class DilemmasState(rx.State):
         try:
             auth = await self.get_state(AuthState)
             client = auth._authenticated_client()
-            user_id = auth.user_id  # Verified against Supabase by _authenticated_client.
+            user_id = (
+                auth.user_id
+            )  # Verified against Supabase by _authenticated_client.
 
             # Fetch all qualifying conversations, not just Supabase's first page.
             # We never select the `evaluation` JSON itself: it is only a filter.
@@ -150,12 +156,14 @@ class DilemmasState(rx.State):
                 title = row.get("title") or "New conversation"
                 date = _date_label(row.get("created_at") or "")
                 description = str(dilemma.get("description", ""))
-                previews.append({
-                    "id": conversation_id,
-                    "title": title,
-                    "description": description,
-                    "date": date,
-                })
+                previews.append(
+                    {
+                        "id": conversation_id,
+                        "title": title,
+                        "description": description,
+                        "date": date,
+                    }
+                )
                 formulations[conversation_id] = {
                     "title": title,
                     "date": date,
@@ -195,7 +203,9 @@ def _list_item(item: rx.Var[dict[str, str]]) -> rx.Component:
             width="100%",
         ),
         on_click=lambda: DilemmasState.select_dilemma(item["id"]),
-        bg=rx.cond(DilemmasState.selected_id == item["id"], style.SURFACE, "transparent"),
+        bg=rx.cond(
+            DilemmasState.selected_id == item["id"], style.SURFACE, "transparent"
+        ),
         **style.dilemma_item,
     )
 
@@ -252,7 +262,11 @@ def _details() -> rx.Component:
         rx.hstack(
             rx.vstack(
                 rx.heading(DilemmasState.selected_title, **style.dilemma_title),
-                rx.text("Conversation created ", DilemmasState.selected_date, **style.dilemma_item_date),
+                rx.text(
+                    "Conversation created ",
+                    DilemmasState.selected_date,
+                    **style.dilemma_item_date,
+                ),
                 spacing="1",
                 align="start",
                 flex="1",
@@ -266,7 +280,9 @@ def _details() -> rx.Component:
             ),
             **style.dilemma_detail_header,
         ),
-        _section("Situation", rx.text(DilemmasState.description, **style.dilemma_description)),
+        _section(
+            "Situation", rx.text(DilemmasState.description, **style.dilemma_description)
+        ),
         _section(
             "Elements",
             _terms("Actions", DilemmasState.actions),
@@ -333,7 +349,10 @@ def dilemmas() -> rx.Component:
                     rx.cond(
                         DilemmasState.selected_id != "",
                         _details(),
-                        rx.text("Select a dilemma to view its formulation.", **style.dilemma_placeholder),
+                        rx.text(
+                            "Select a dilemma to view its formulation.",
+                            **style.dilemma_placeholder,
+                        ),
                     ),
                 ),
                 **style.dilemma_detail_panel,

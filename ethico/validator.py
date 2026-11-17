@@ -2,13 +2,15 @@ from typing import Optional
 from pydantic import BaseModel, field_validator, ValidationInfo
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
     anthropic_api_key: str
     openai_api_key: str
-    model_config = SettingsConfigDict(env_file='.env', 
-                                      env_file_encoding='utf-8',
-                                      extra='ignore')
-    
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
+
+
 class KantianModel(BaseModel):
     description: str
     actions: list[str]
@@ -16,7 +18,7 @@ class KantianModel(BaseModel):
     mechanisms: dict[str, str]
     patients: list[str]
     affects: dict[str, list[list[str]]]
-        
+
     @field_validator("actions")
     @classmethod
     def validate_actions(cls, actions: list[str]) -> list[str]:
@@ -25,7 +27,7 @@ class KantianModel(BaseModel):
         if "refrain" not in actions:
             raise ValueError("'actions' must contain a 'refrain' action.")
         return actions
-    
+
     @field_validator("consequences")
     @classmethod
     def validate_consequences(cls, consequences: list[str]) -> list[str]:
@@ -35,23 +37,37 @@ class KantianModel(BaseModel):
 
     @field_validator("mechanisms")
     @classmethod
-    def validate_mechanisms(cls, mechanisms: dict[str, str], info: ValidationInfo) -> dict[str, str]:
-        actions = info.data['actions']
-        consequences = info.data['consequences']
+    def validate_mechanisms(
+        cls, mechanisms: dict[str, str], info: ValidationInfo
+    ) -> dict[str, str]:
+        actions = info.data["actions"]
+        consequences = info.data["consequences"]
         actions_negations = {f"Not('{action}')" for action in actions}
-        consequences_negations = {f"Not('{consequence}')" for consequence in consequences}
-        valid_causes = set(actions) | set(consequences) | actions_negations | consequences_negations
+        consequences_negations = {
+            f"Not('{consequence}')" for consequence in consequences
+        }
+        valid_causes = (
+            set(actions)
+            | set(consequences)
+            | actions_negations
+            | consequences_negations
+        )
 
         for consequence, cause in mechanisms.items():
-            if consequence not in consequences and not (consequence.startswith("Not('") and consequence.endswith("')")):
-                raise ValueError(f"Mechanism key '{consequence}' must be a consequence or its negation.")
-            
+            if consequence not in consequences and not (
+                consequence.startswith("Not('") and consequence.endswith("')")
+            ):
+                raise ValueError(
+                    f"Mechanism key '{consequence}' must be a consequence or its negation."
+                )
+
         for consequence in consequences:
             negation = f"Not('{consequence}')"
             if consequence not in mechanisms and negation not in mechanisms:
-                raise ValueError(f"Each consequence must have a corresponding mechanism key or its negation.")
+                raise ValueError(
+                    f"Each consequence must have a corresponding mechanism key or its negation."
+                )
         return mechanisms
-
 
     @field_validator("patients")
     @classmethod
@@ -59,24 +75,37 @@ class KantianModel(BaseModel):
         if len(patients) == 0:
             raise ValueError("'patients' must contain at least one patient.")
         return patients
-    
+
     @field_validator("affects")
     @classmethod
-    def validate_affects(cls, affects: dict[str, list[list[str]]], info: ValidationInfo) -> dict[str, list[list[str]]]:
-        patients = info.data['patients']
-        actions = info.data['actions']
-        consequences = info.data['consequences']
-        
+    def validate_affects(
+        cls, affects: dict[str, list[list[str]]], info: ValidationInfo
+    ) -> dict[str, list[list[str]]]:
+        patients = info.data["patients"]
+        actions = info.data["actions"]
+        consequences = info.data["consequences"]
+
         actions_negations = {f"Not('{action}')" for action in actions}
-        consequences_negations = {f"Not('{consequence}')" for consequence in consequences}
-        valid_events = set(consequences)  | set(actions) | consequences_negations | actions_negations
-        
+        consequences_negations = {
+            f"Not('{consequence}')" for consequence in consequences
+        }
+        valid_events = (
+            set(consequences)
+            | set(actions)
+            | consequences_negations
+            | actions_negations
+        )
+
         for event, affect_list in affects.items():
             if event not in valid_events:
-                raise ValueError(f"Affect key '{event}' must be an action or consequence or their negation.")
+                raise ValueError(
+                    f"Affect key '{event}' must be an action or consequence or their negation."
+                )
             for affect in affect_list:
                 if len(affect) != 2:
-                    raise ValueError(f"Each affect entry must be a list of [patient, valence].")
+                    raise ValueError(
+                        f"Each affect entry must be a list of [patient, valence]."
+                    )
                 patient, valence = affect
                 if patient not in patients:
                     raise ValueError(f"Affect patient '{patient}' must be a patient.")
@@ -100,7 +129,7 @@ class UtilitarianModel(BaseModel):
         if "refrain" not in actions:
             raise ValueError("'actions' must contain a 'refrain' action.")
         return actions
-    
+
     @field_validator("consequences")
     @classmethod
     def validate_consequences(cls, consequences: list[str]) -> list[str]:
@@ -110,25 +139,35 @@ class UtilitarianModel(BaseModel):
 
     @field_validator("mechanisms")
     @classmethod
-    def validate_mechanisms(cls, mechanisms: dict[str, str], info: ValidationInfo) -> dict[str, str]:
-        actions = info.data['actions']
-        consequences = info.data['consequences']
+    def validate_mechanisms(
+        cls, mechanisms: dict[str, str], info: ValidationInfo
+    ) -> dict[str, str]:
+        actions = info.data["actions"]
+        consequences = info.data["consequences"]
 
         for key in mechanisms.keys():
-            if key not in consequences and not (key.startswith("Not('") and key.endswith("')")):
-                raise ValueError(f"Mechanism key '{key}' must be a consequence or its negation.")
+            if key not in consequences and not (
+                key.startswith("Not('") and key.endswith("')")
+            ):
+                raise ValueError(
+                    f"Mechanism key '{key}' must be a consequence or its negation."
+                )
         for consequence in consequences:
             negation = f"Not('{consequence}')"
             if consequence not in mechanisms and negation not in mechanisms:
-                raise ValueError(f"Each consequence must have a corresponding mechanism key or its negation.")
+                raise ValueError(
+                    f"Each consequence must have a corresponding mechanism key or its negation."
+                )
         return mechanisms
 
     @field_validator("utilities")
     @classmethod
-    def validate_utilities(cls, utilities: dict[str, int], info: ValidationInfo) -> dict[str, int]:
+    def validate_utilities(
+        cls, utilities: dict[str, int], info: ValidationInfo
+    ) -> dict[str, int]:
         consequences = info.data["consequences"]
         negations = {f"Not('{consequence}')" for consequence in consequences}
-        
+
         utility_keys = set(utilities.keys())
 
         for key in utility_keys:
@@ -138,7 +177,10 @@ class UtilitarianModel(BaseModel):
                 )
 
         for consequence in consequences:
-            if consequence not in utility_keys and f"Not('{consequence}')" not in utility_keys:
+            if (
+                consequence not in utility_keys
+                and f"Not('{consequence}')" not in utility_keys
+            ):
                 raise ValueError(
                     f"Each consequence or its negation must have a corresponding utility key."
                 )
@@ -148,19 +190,21 @@ class UtilitarianModel(BaseModel):
 class UnifiedModel(KantianModel):
     description: str
     actions: list[str]
-    consequences: list[str] 
-    mechanisms: dict[str, str] 
-    utilities: dict[str, int] 
+    consequences: list[str]
+    mechanisms: dict[str, str]
+    utilities: dict[str, int]
     goals: dict[str, list[str]]
-    patients: list[str] 
+    patients: list[str]
     affects: dict[str, list[list[str]]]
-    
+
     @field_validator("utilities")
     @classmethod
-    def validate_utilities(cls, utilities: dict[str, int], info: ValidationInfo) -> dict[str, int]:
+    def validate_utilities(
+        cls, utilities: dict[str, int], info: ValidationInfo
+    ) -> dict[str, int]:
         consequences = info.data["consequences"]
         negations = {f"Not('{consequence}')" for consequence in consequences}
-        
+
         utility_keys = set(utilities.keys())
 
         for key in utility_keys:
@@ -170,7 +214,10 @@ class UnifiedModel(KantianModel):
                 )
 
         for consequence in consequences:
-            if consequence not in utility_keys and f"Not('{consequence}')" not in utility_keys:
+            if (
+                consequence not in utility_keys
+                and f"Not('{consequence}')" not in utility_keys
+            ):
                 raise ValueError(
                     f"Each consequence or its negation must have a corresponding utility key."
                 )

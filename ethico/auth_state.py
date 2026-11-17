@@ -4,7 +4,6 @@ import reflex as rx
 
 from .database import create_supabase_client
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -42,10 +41,12 @@ class AuthState(rx.State):
 
     def _save_session(self, session):
         """Save the latest Supabase session credentials."""
-        self.stored_session = json.dumps({
-            "access_token": session.access_token,
-            "refresh_token": session.refresh_token,
-        })
+        self.stored_session = json.dumps(
+            {
+                "access_token": session.access_token,
+                "refresh_token": session.refresh_token,
+            }
+        )
 
         self.user_id = str(session.user.id)
         self.user_email = session.user.email or ""
@@ -128,10 +129,12 @@ class AuthState(rx.State):
         try:
             client = create_supabase_client()
 
-            response = client.auth.sign_up({
-                "email": self.email,
-                "password": self.password,
-            })
+            response = client.auth.sign_up(
+                {
+                    "email": self.email,
+                    "password": self.password,
+                }
+            )
 
             if response.session:
                 await self._reset_chat_state()
@@ -140,8 +143,7 @@ class AuthState(rx.State):
                 return rx.redirect("/")
 
             self.auth_error = (
-                "Registration submitted. "
-                "Check your email to confirm your account."
+                "Registration submitted. " "Check your email to confirm your account."
             )
 
         except Exception:
@@ -159,10 +161,12 @@ class AuthState(rx.State):
         try:
             client = create_supabase_client()
 
-            response = client.auth.sign_in_with_password({
-                "email": self.email,
-                "password": self.password,
-            })
+            response = client.auth.sign_in_with_password(
+                {
+                    "email": self.email,
+                    "password": self.password,
+                }
+            )
 
             if not response.session:
                 self.auth_error = "Login failed."
@@ -224,9 +228,7 @@ class AuthState(rx.State):
                     tokens["refresh_token"],
                 )
 
-                client.auth.sign_out(
-                    options={"scope": "local"}
-                )
+                client.auth.sign_out(options={"scope": "local"})
 
         except Exception:
             logger.warning(

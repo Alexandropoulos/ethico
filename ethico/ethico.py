@@ -5,8 +5,7 @@ from ethico.pages.dilemmas import dilemmas
 from ethico.pages.login import login
 from ethico.pages.about import about
 from ethico.pages.index import index
-    
-   
+
 app = rx.App()
 app.add_page(
     login,

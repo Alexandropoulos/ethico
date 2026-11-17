@@ -11,11 +11,11 @@ from openai import APIError, AsyncOpenAI
 
 from ethico.auth_state import AuthState
 from ethico.constants import (
-    EXPLAIN_PROMPT, 
-    OPENAI_TOOLS, 
+    EXPLAIN_PROMPT,
+    OPENAI_TOOLS,
     SYSTEM_PROMPT,
     TITLE_GENERATION_PROMPT,
-    TROLLEY_TEST_PROMPT
+    TROLLEY_TEST_PROMPT,
 )
 from ethico.conversation_service import (
     AlreadyEvaluatedError,
@@ -30,7 +30,6 @@ from ethico.conversation_service import (
 )
 from ethico.evaluator import evaluate_dilemma
 from ethico.validator import UnifiedModel
-
 
 MODEL = "gpt-4o-mini"
 REPEAT_EVALUATION_REPLY = (
@@ -55,7 +54,7 @@ class State(rx.State):
     dilemma_json: str = ""
     dilemma_panel_open: bool = False
     evaluated: bool = False
-    
+
     conversation_id: str = ""
     conversations: list[dict[str, str]] = []
 
@@ -144,7 +143,11 @@ class State(rx.State):
         saved = record.data or {}
         self.evaluated = saved.get("evaluation") is not None
         dilemma = saved.get("dilemma") if self.evaluated else None
-        self.dilemma_json = json.dumps(dilemma, indent=2, ensure_ascii=False) if dilemma is not None else ""
+        self.dilemma_json = (
+            json.dumps(dilemma, indent=2, ensure_ascii=False)
+            if dilemma is not None
+            else ""
+        )
         self.dilemma_panel_open = bool(self.dilemma_json)
         self.conversation_id = conversation_id
         self.question = ""
@@ -168,8 +171,14 @@ class State(rx.State):
         return rx.redirect("/")
 
     async def _reply_to_evaluation_request(
-        self, client, conversation_id: str, question: str, generation: int,
-        reply: str, evaluated: bool = False, user_saved: bool = False,
+        self,
+        client,
+        conversation_id: str,
+        question: str,
+        generation: int,
+        reply: str,
+        evaluated: bool = False,
+        user_saved: bool = False,
     ) -> None:
         """Show an evaluation refusal in chat and retain the exchange."""
         async with self:
@@ -207,7 +216,7 @@ class State(rx.State):
             auth = await self.get_state(AuthState)
             try:
                 supabase = auth._authenticated_client()
-                user_id = auth.user_id  
+                user_id = auth.user_id
             except Exception:
                 logger.warning("Rejected unauthenticated chat event", exc_info=True)
                 self.error = "Please log in before using the chat."
@@ -238,13 +247,18 @@ class State(rx.State):
             if is_evaluation:
                 # Recheck the database in case this chat was evaluated in another tab.
                 if already_evaluated or (
-                    conversation_id and await asyncio.to_thread(
+                    conversation_id
+                    and await asyncio.to_thread(
                         conversation_has_evaluation, supabase, user_id, conversation_id
                     )
                 ):
                     await self._reply_to_evaluation_request(
-                        supabase, conversation_id, question, generation,
-                        REPEAT_EVALUATION_REPLY, evaluated=True,
+                        supabase,
+                        conversation_id,
+                        question,
+                        generation,
+                        REPEAT_EVALUATION_REPLY,
+                        evaluated=True,
                     )
                     return
 
@@ -256,7 +270,10 @@ class State(rx.State):
                         ready = await self._has_adequate_context(checker, prior_history)
                 if not ready:
                     await self._reply_to_evaluation_request(
-                        supabase, conversation_id, question, generation,
+                        supabase,
+                        conversation_id,
+                        question,
+                        generation,
                         INSUFFICIENT_CONTEXT_REPLY,
                     )
                     return
@@ -269,17 +286,19 @@ class State(rx.State):
                     if self.chat_generation != generation:
                         return
                     self.conversation_id = conversation_id
-                    self.conversations.insert(0, {
-                        "id": conversation_id,
-                        "title": "New conversation",
-                    })
+                    self.conversations.insert(
+                        0,
+                        {
+                            "id": conversation_id,
+                            "title": "New conversation",
+                        },
+                    )
                 yield
 
             async with self:
                 if self.chat_generation != generation:
                     return
 
-            
             await asyncio.to_thread(
                 save_message, supabase, conversation_id, "user", question
             )
@@ -304,7 +323,7 @@ class State(rx.State):
                     )
                     with open(evaluation_path, encoding="utf-8") as f:
                         evaluation = json.load(f)
-                    
+
                     await asyncio.to_thread(
                         save_evaluation, supabase, conversation_id, evaluation
                     )
@@ -312,15 +331,19 @@ class State(rx.State):
                     async with self:
                         if self.chat_generation != generation:
                             return
-                        self.dilemma_json = Path(situation_path).read_text(encoding="utf-8")
+                        self.dilemma_json = Path(situation_path).read_text(
+                            encoding="utf-8"
+                        )
                         self.dilemma_panel_open = True
                         self.evaluated = True
-                    messages.append({
-                        "role": "system",
-                        "content": EXPLAIN_PROMPT.format(
-                            evaluation=json.dumps(evaluation, indent=2)
-                        ),
-                    })
+                    messages.append(
+                        {
+                            "role": "system",
+                            "content": EXPLAIN_PROMPT.format(
+                                evaluation=json.dumps(evaluation, indent=2)
+                            ),
+                        }
+                    )
 
                 stream = await openai.chat.completions.create(
                     model=MODEL,
@@ -361,17 +384,19 @@ class State(rx.State):
                 # Title only conversations that have not yet been named.
                 # A generic opener should not become a misleading title.
                 async with self:
-                    needs_title = (
-                        self.chat_generation == generation
-                        and any(
-                            c["id"] == conversation_id
-                            and c["title"] == "New conversation"
-                            for c in self.conversations
-                        )
+                    needs_title = self.chat_generation == generation and any(
+                        c["id"] == conversation_id and c["title"] == "New conversation"
+                        for c in self.conversations
                     )
 
                 if needs_title and question.lower().strip(" !?.") not in {
-                    "hi", "hello", "hey", "thanks", "thank you", "γεια", "γειά",
+                    "hi",
+                    "hello",
+                    "hey",
+                    "thanks",
+                    "thank you",
+                    "γεια",
+                    "γειά",
                 }:
                     try:
                         title_messages = [
@@ -387,33 +412,47 @@ class State(rx.State):
                         if title:
                             await asyncio.to_thread(
                                 set_conversation_title,
-                                supabase, user_id, conversation_id, title,
+                                supabase,
+                                user_id,
+                                conversation_id,
+                                title,
                             )
                             async with self:
                                 if self.chat_generation == generation:
                                     self.conversations = [
-                                        {**c, "title": title}
-                                        if c["id"] == conversation_id
-                                        and c["title"] == "New conversation"
-                                        else c
+                                        (
+                                            {**c, "title": title}
+                                            if c["id"] == conversation_id
+                                            and c["title"] == "New conversation"
+                                            else c
+                                        )
                                         for c in self.conversations
                                     ]
                             yield
                     except Exception:
                         # Naming is optional; it must never fail the chat reply.
-                        logger.exception("Could not generate or save conversation title")
+                        logger.exception(
+                            "Could not generate or save conversation title"
+                        )
 
         except AlreadyEvaluatedError:
             # Another tab may have completed the evaluation after our initial check.
             await self._reply_to_evaluation_request(
-                supabase, conversation_id, question, generation,
-                REPEAT_EVALUATION_REPLY, evaluated=True, user_saved=user_saved,
+                supabase,
+                conversation_id,
+                question,
+                generation,
+                REPEAT_EVALUATION_REPLY,
+                evaluated=True,
+                user_saved=user_saved,
             )
         except APIError:
             logger.exception("OpenAI request failed")
             async with self:
                 if self.chat_generation == generation:
-                    self.error = "The request failed. Check your API access and try again."
+                    self.error = (
+                        "The request failed. Check your API access and try again."
+                    )
                     if not user_saved:
                         self.chat_history.pop()
                         self.question = question
@@ -421,7 +460,9 @@ class State(rx.State):
             logger.exception("Chat processing or persistence failed")
             async with self:
                 if self.chat_generation == generation:
-                    self.error = "Could not process or save this message. Check the server logs."
+                    self.error = (
+                        "Could not process or save this message. Check the server logs."
+                    )
                     if not user_saved:
                         self.chat_history.pop()
                         self.question = question
@@ -451,8 +492,7 @@ class State(rx.State):
     ) -> bool:
         """Check whether user-provided facts are sufficient for ethical evaluation."""
         transcript = "\n".join(
-            f"User: {user[:1200]}\nAssistant: {reply[:600]}"
-            for user, reply in history
+            f"User: {user[:1200]}\nAssistant: {reply[:600]}" for user, reply in history
         )[-9000:]
         response = await client.chat.completions.create(
             model=MODEL,
@@ -484,7 +524,8 @@ class State(rx.State):
         """Summarize the first meaningful exchange into a sidebar title."""
         transcript = "\n".join(
             f"{m['role']}: {m['content'][:500]}"
-            for m in messages if m["role"] in {"user", "assistant"}
+            for m in messages
+            if m["role"] in {"user", "assistant"}
         )[-2500:]
         response = await client.chat.completions.create(
             model=MODEL,
@@ -499,7 +540,7 @@ class State(rx.State):
             max_completion_tokens=32,
         )
         title = (response.choices[0].message.content or "").split("\n", 1)[0]
-        title = title.strip().strip('"\'`').strip()
+        title = title.strip().strip("\"'`").strip()
         if not title or title.upper() == "NONE":
             return ""
         if len(title) > 60:
@@ -507,19 +548,16 @@ class State(rx.State):
         return title
 
     def _create_message_list(self) -> list[dict[str, str]]:
-        messages = [{"role": "system", "content": TROLLEY_TEST_PROMPT}]
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
         for previous_question, previous_answer in self.chat_history:
             messages.append({"role": "user", "content": previous_question})
             if previous_answer:
                 messages.append({"role": "assistant", "content": previous_answer})
         return messages
 
-    async def _extract_dilemma(
-        self, client: AsyncOpenAI, messages: list[dict]
-    ) -> str:
+    async def _extract_dilemma(self, client: AsyncOpenAI, messages: list[dict]) -> str:
         tool = next(
-            t for t in OPENAI_TOOLS
-            if t["function"]["name"] == "extract_dilemma"
+            t for t in OPENAI_TOOLS if t["function"]["name"] == "extract_dilemma"
         )
 
         response = await client.chat.completions.create(
@@ -531,7 +569,7 @@ class State(rx.State):
                 "function": {"name": "extract_dilemma"},
             },
         )
-        
+
         tool_calls = response.choices[0].message.tool_calls
         if not tool_calls:
             raise ValueError("Failed to extract dilemma.")

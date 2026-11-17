@@ -3,6 +3,7 @@ from ethico.constants import SYSTEM_INFORMATION
 from ethico.components import sidebar
 from ethico import style
 
+
 def about_content() -> rx.Component:
     return rx.box(
         rx.vstack(
@@ -16,7 +17,8 @@ def about_content() -> rx.Component:
         ),
         **style.about_card,
     )
-    
+
+
 def about() -> rx.Component:
     return rx.hstack(
         sidebar(),

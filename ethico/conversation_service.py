@@ -7,23 +7,21 @@ class AlreadyEvaluatedError(RuntimeError):
 
 
 def _insert_id(client: Client, table: str, payload: dict[str, Any]) -> str:
-    response = (
-        client.table(table)
-        .insert(payload)
-        .select("id")
-        .execute()
-    )
+    response = client.table(table).insert(payload).select("id").execute()
     if not response.data:
         raise RuntimeError(f"Could not insert a row into {table}.")
     return str(response.data[0]["id"])
 
 
 def create_conversation(client: Client, user_id: str, title: str) -> str:
-    return _insert_id(client, "conversations", {
-        "user_id": user_id,
-        "title": title or "New conversation",
-    })
-
+    return _insert_id(
+        client,
+        "conversations",
+        {
+            "user_id": user_id,
+            "title": title or "New conversation",
+        },
+    )
 
 
 def list_conversations(client: Client, user_id: str) -> list[dict[str, str]]:
@@ -36,8 +34,7 @@ def list_conversations(client: Client, user_id: str) -> list[dict[str, str]]:
         .execute()
     )
     return [
-        {"id": str(row["id"]), "title": row["title"]}
-        for row in (response.data or [])
+        {"id": str(row["id"]), "title": row["title"]} for row in (response.data or [])
     ]
 
 
@@ -83,16 +80,18 @@ def conversation_has_evaluation(
     return response.data[0]["evaluation"] is not None
 
 
-def save_message(
-    client: Client, conversation_id: str, role: str, content: str
-) -> str:
+def save_message(client: Client, conversation_id: str, role: str, content: str) -> str:
     if role not in {"user", "assistant", "system"}:
         raise ValueError("Unsupported message role.")
-    return _insert_id(client, "messages", {
-        "conversation_id": conversation_id,
-        "role": role,
-        "content": content,
-    })
+    return _insert_id(
+        client,
+        "messages",
+        {
+            "conversation_id": conversation_id,
+            "role": role,
+            "content": content,
+        },
+    )
 
 
 def _update_conversation(
@@ -141,15 +140,23 @@ def save_situation(
     client: Client, conversation_id: str, situation: dict[str, Any]
 ) -> None:
     """Save a formulation only if this conversation is not yet evaluated."""
-    _update_conversation(client, conversation_id, {
-        "dilemma": situation,
-    })
+    _update_conversation(
+        client,
+        conversation_id,
+        {
+            "dilemma": situation,
+        },
+    )
 
 
 def save_evaluation(
     client: Client, conversation_id: str, evaluation: dict[str, Any]
 ) -> None:
     """Save the evaluation directly on its conversation."""
-    _update_conversation(client, conversation_id, {
-        "evaluation": evaluation,
-    })
+    _update_conversation(
+        client,
+        conversation_id,
+        {
+            "evaluation": evaluation,
+        },
+    )

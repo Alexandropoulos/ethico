@@ -6,7 +6,7 @@ from ethics.cam.principles import KantianHumanityPrinciple, UtilitarianPrinciple
 
 def evaluate_dilemma(situation_path: str, evaluation_path: str):
     """
-    Reads a dilemma from the specified situation path and evaluates it using the Kantian Humanity Principle 
+    Reads a dilemma from the specified situation path and evaluates it using the Kantian Humanity Principle
     and the Utilitarian Principle. The results are saved to the specified evaluation path.
     The dilemma is always assumed to be valid.
     """
@@ -29,7 +29,7 @@ def evaluate_dilemma(situation_path: str, evaluation_path: str):
         "kantian_humanity_principle": result1,
         "utilitarian_principle": result2,
     }
-    
+
     with open(evaluation_path, "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2, default=str)
 

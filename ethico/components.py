@@ -1,11 +1,15 @@
-import reflex as rx 
+import reflex as rx
+from typing import Callable, Optional
 
 from ethico import style
 from ethico.state import State
 from ethico.constants import INTRO_MESSAGE
 from ethico.auth_state import AuthState
 
-def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
+
+def sidebar_item(
+    text: str, icon: str, href: str, on_click: Optional[Callable] = None
+) -> rx.Component:
     return rx.link(
         rx.hstack(
             rx.icon(icon),
@@ -13,48 +17,47 @@ def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
             **style.sidebar_link_row,
         ),
         href=href,
+        on_click=on_click,
         **style.sidebar_link_style,
     )
 
 
-
 def sidebar_items() -> rx.Component:
     return rx.vstack(
-        sidebar_item("Chat", "message_circle", "/"),
+        sidebar_item("New", "plus", "/"),
         sidebar_item("Dilemmas", "scale", "/dilemmas"),
-        sidebar_item("About", "info", "/about"),
         **style.sidebar_navigation,
     )
 
 
-
 def sidebar_conversations() -> rx.Component:
     return rx.vstack(
-        rx.hstack(
-            rx.text("Recent conversations", **style.sidebar_conversations_heading),
-            rx.spacer(),
-            rx.button(
-                rx.icon("square-pen", size=16),
-                on_click=State.new_conversation,
-                disabled=State.processing,
-                aria_label="New conversation",
-                title="New conversation",
-                **style.sidebar_new_conversation_button,
-            ),
-            width="100%",
-            align="center",
+        rx.text(
+            "Recent conversations",
+            **style.sidebar_conversations_heading,
         ),
         rx.box(
             rx.vstack(
                 rx.cond(
-                    State.conversations.length() == 0,
-                    rx.text("No conversations yet", **style.sidebar_conversations_empty),
+                    State.conversations.length() == 0,  # type: ignore
+                    rx.text(
+                        "No conversations yet",
+                        **style.sidebar_conversations_empty,
+                    ),
                 ),
                 rx.foreach(
                     State.conversations,
                     lambda conversation: rx.button(
-                        rx.text(conversation["title"], **style.sidebar_conversation_title),
-                        on_click=lambda: State.open_conversation(conversation["id"]),
+                        rx.box(
+                            rx.text(
+                                conversation["title"],
+                                **style.sidebar_conversation_title,
+                            ),
+                            **style.sidebar_conversation_title_scroll,
+                        ),
+                        on_click=lambda: State.open_conversation(
+                            conversation["id"]
+                        ),  # type: ignore
                         disabled=State.processing,
                         bg=rx.cond(
                             State.conversation_id == conversation["id"],
@@ -73,43 +76,33 @@ def sidebar_conversations() -> rx.Component:
     )
 
 
-
 def sidebar() -> rx.Component:
     return rx.vstack(
         rx.hstack(
-            rx.icon("heart", **style.sidebar_logo),
             rx.heading(
                 "THUFIR",
                 **style.sidebar_heading,
             ),
+            rx.heading(
+                "A virtual ethics advisor",
+                **style.sidebar_subheading,
+            ),
             **style.sidebar_brand_row,
         ),
-
         sidebar_items(),
         rx.cond(
             AuthState.is_authenticated,
             sidebar_conversations(),
             rx.box(**style.sidebar_conversations_section),
         ),
-
         rx.vstack(
             rx.cond(
                 AuthState.is_authenticated,
-                rx.button(
-                    rx.icon("log-out"),
-                    rx.text("Log out", size="4"),
-                    on_click=AuthState.sign_out,
-                    **style.sidebar_logout,
-                ),
-                sidebar_item(
-                    "Log in",
-                    "log-in",
-                    "/login",
-                ),
+                sidebar_item("Log out", "log-out", "/", AuthState.sign_out),
+                sidebar_item("Log in", "log-in", "/login"),
             ),
-
+            sidebar_item("About", "info", "/about"),
             rx.divider(),
-
             rx.cond(
                 AuthState.is_authenticated,
                 rx.hstack(
@@ -119,10 +112,6 @@ def sidebar() -> rx.Component:
                     ),
                     rx.vstack(
                         rx.text(
-                            "My account",
-                            **style.sidebar_account_title,
-                        ),
-                        rx.text(
                             AuthState.user_email,
                             **style.sidebar_account_email,
                         ),
@@ -131,12 +120,11 @@ def sidebar() -> rx.Component:
                     **style.sidebar_account_row,
                 ),
             ),
-
             **style.sidebar_footer,
         ),
-
         **style.sidebar_container,
     )
+
 
 def qa(question: str, answer: str) -> rx.Component:
     return rx.vstack(
@@ -151,11 +139,12 @@ def qa(question: str, answer: str) -> rx.Component:
         **style.message_stack,
     )
 
+
 def chat() -> rx.Component:
     return rx.box(
         rx.auto_scroll(
             rx.cond(
-                State.chat_history.length() == 0, # type: ignore
+                State.chat_history.length() == 0,  # type: ignore
                 rx.box(
                     rx.markdown(INTRO_MESSAGE),
                     **style.intro_message,
@@ -169,15 +158,16 @@ def chat() -> rx.Component:
         ),
         **style.chat_panel,
     )
-    
+
 
 def action_bar() -> rx.Component:
-    enabled = AuthState.auth_checked & AuthState.is_authenticated
+    enabled = AuthState.auth_checked & AuthState.is_authenticated  # type: ignore
     return rx.vstack(
         rx.hstack(
             rx.input(
                 value=State.question,
                 disabled=State.processing | ~enabled,
+                color_scheme="gray",
                 placeholder="Ask a question",
                 on_change=State.set_question,
                 style=style.input_style,
@@ -202,20 +192,6 @@ def chat_page() -> rx.Component:
         sidebar(),
         rx.center(
             rx.vstack(
-                rx.cond(
-                    (State.dilemma_json != "") & ~State.dilemma_panel_open,
-                    rx.hstack(
-                        rx.spacer(),
-                        rx.icon_button(
-                            rx.icon("chevron-left", size=18),
-                            on_click=State.toggle_dilemma_panel,
-                            aria_label="Open dilemma model",
-                            title="Open dilemma model",
-                            **style.dilemma_panel_toggle,
-                        ),
-                        width="100%",
-                    ),
-                ),
                 chat(),
                 action_bar(),
                 rx.cond(
@@ -227,8 +203,14 @@ def chat_page() -> rx.Component:
             **style.page_content,
         ),
         rx.cond(
-            (State.dilemma_json != "") & State.dilemma_panel_open,
-            dilemma_panel(),
+            (State.dilemma_json != "") & ~State.dilemma_panel_open,
+            rx.button(
+                rx.icon("panel-right-open", size=17),
+                "Show dilemma model",
+                on_click=State.toggle_dilemma_panel,
+                aria_label="Show dilemma model",
+                **style.dilemma_panel_toggle,
+            ),
         ),
         **style.page_shell,
     )
