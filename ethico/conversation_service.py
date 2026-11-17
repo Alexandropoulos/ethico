@@ -2,6 +2,10 @@ from typing import Any
 from supabase import Client
 
 
+class AlreadyEvaluatedError(RuntimeError):
+    """An evaluation already exists for this conversation."""
+
+
 def _insert_id(client: Client, table: str, payload: dict[str, Any]) -> str:
     response = (
         client.table(table)
@@ -62,6 +66,23 @@ def list_messages(
     return response.data or []
 
 
+def conversation_has_evaluation(
+    client: Client, user_id: str, conversation_id: str
+) -> bool:
+    """Check whether this user's conversation has already been evaluated."""
+    response = (
+        client.table("conversations")
+        .select("evaluation")
+        .eq("id", conversation_id)
+        .eq("user_id", user_id)
+        .limit(1)
+        .execute()
+    )
+    if not response.data:
+        raise ValueError("Conversation not found.")
+    return response.data[0]["evaluation"] is not None
+
+
 def save_message(
     client: Client, conversation_id: str, role: str, content: str
 ) -> str:
@@ -81,10 +102,21 @@ def _update_conversation(
         client.table("conversations")
         .update(payload)
         .eq("id", conversation_id)
+        .is_("evaluation", "null")
         .select("id")
         .execute()
     )
     if not response.data:
+        # Distinguish a duplicate evaluation from a genuine database failure.
+        existing = (
+            client.table("conversations")
+            .select("evaluation")
+            .eq("id", conversation_id)
+            .limit(1)
+            .execute()
+        )
+        if existing.data and existing.data[0]["evaluation"] is not None:
+            raise AlreadyEvaluatedError("This conversation has already been evaluated.")
         raise RuntimeError("Could not update the conversation.")
 
 
@@ -108,10 +140,9 @@ def set_conversation_title(
 def save_situation(
     client: Client, conversation_id: str, situation: dict[str, Any]
 ) -> None:
-    """Save the latest formulation and clear any older evaluation."""
+    """Save a formulation only if this conversation is not yet evaluated."""
     _update_conversation(client, conversation_id, {
         "dilemma": situation,
-        "evaluation": None,
     })
 
 

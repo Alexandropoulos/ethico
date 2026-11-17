@@ -18,6 +18,8 @@ from ethico.constants import (
     TROLLEY_TEST_PROMPT
 )
 from ethico.conversation_service import (
+    AlreadyEvaluatedError,
+    conversation_has_evaluation,
     create_conversation,
     list_conversations,
     list_messages,
@@ -31,6 +33,16 @@ from ethico.validator import UnifiedModel
 
 
 MODEL = "gpt-4o-mini"
+REPEAT_EVALUATION_REPLY = (
+    "I can't evaluate this conversation a second time. Each conversation "
+    "supports one evaluation, but we can continue discussing the existing "
+    "evaluation. To evaluate a different dilemma, start a new conversation."
+)
+INSUFFICIENT_CONTEXT_REPLY = (
+    "I don't have enough information to evaluate this dilemma yet. "
+    "Please describe the decision, the available options, who is affected, "
+    "and their likely consequences. Then we can proceed with the evaluation."
+)
 logger = logging.getLogger(__name__)
 load_dotenv()
 
@@ -42,6 +54,7 @@ class State(rx.State):
     error: str = ""
     dilemma_json: str = ""
     dilemma_panel_open: bool = False
+    evaluated: bool = False
     
     conversation_id: str = ""
     conversations: list[dict[str, str]] = []
@@ -64,6 +77,7 @@ class State(rx.State):
         self.chat_history = []
         self.dilemma_json = ""
         self.dilemma_panel_open = False
+        self.evaluated = False
         self.processing = False
         self.error = ""
         self.conversation_id = ""
@@ -128,7 +142,8 @@ class State(rx.State):
 
         self.chat_history = history
         saved = record.data or {}
-        dilemma = saved.get("dilemma") if saved.get("evaluation") is not None else None
+        self.evaluated = saved.get("evaluation") is not None
+        dilemma = saved.get("dilemma") if self.evaluated else None
         self.dilemma_json = json.dumps(dilemma, indent=2, ensure_ascii=False) if dilemma is not None else ""
         self.dilemma_panel_open = bool(self.dilemma_json)
         self.conversation_id = conversation_id
@@ -146,10 +161,41 @@ class State(rx.State):
         self.chat_history = []
         self.dilemma_json = ""
         self.dilemma_panel_open = False
+        self.evaluated = False
         self.question = ""
         self.error = ""
         self.chat_generation += 1
         return rx.redirect("/")
+
+    async def _reply_to_evaluation_request(
+        self, client, conversation_id: str, question: str, generation: int,
+        reply: str, evaluated: bool = False, user_saved: bool = False,
+    ) -> None:
+        """Show an evaluation refusal in chat and retain the exchange."""
+        async with self:
+            if self.chat_generation != generation:
+                return
+            if evaluated:
+                self.evaluated = True
+            self.error = ""
+            self.question = ""
+            if self.chat_history and self.chat_history[-1] == (question, ""):
+                self.chat_history[-1] = (question, reply)
+            else:
+                self.chat_history.append((question, reply))
+
+        if conversation_id:
+            try:
+                if not user_saved:
+                    await asyncio.to_thread(
+                        save_message, client, conversation_id, "user", question
+                    )
+                await asyncio.to_thread(
+                    save_message, client, conversation_id, "assistant", reply
+                )
+            except Exception:
+                # A persistence failure must not prevent the explanatory reply.
+                logger.exception("Could not save evaluation-request response")
 
     @rx.event(background=True)
     async def answer(self):
@@ -167,11 +213,14 @@ class State(rx.State):
                 self.error = "Please log in before using the chat."
                 return
 
+            is_evaluation = question.lower().strip(" !?.") == "evaluate"
+            already_evaluated = is_evaluation and self.evaluated
             api_key = os.getenv("OPENAI_API_KEY")
-            if not api_key:
+            if not api_key and not already_evaluated:
                 self.error = "Set OPENAI_API_KEY and restart the app."
                 return
 
+            prior_history = list(self.chat_history) if is_evaluation else []
             self.processing = True
             self.error = ""
             self.question = ""
@@ -186,6 +235,32 @@ class State(rx.State):
         answer_parts: list[str] = []
 
         try:
+            if is_evaluation:
+                # Recheck the database in case this chat was evaluated in another tab.
+                if already_evaluated or (
+                    conversation_id and await asyncio.to_thread(
+                        conversation_has_evaluation, supabase, user_id, conversation_id
+                    )
+                ):
+                    await self._reply_to_evaluation_request(
+                        supabase, conversation_id, question, generation,
+                        REPEAT_EVALUATION_REPLY, evaluated=True,
+                    )
+                    return
+
+                # Avoid a model call when no completed exchange exists yet.
+                ready = False
+                if any(user.strip() and reply.strip() for user, reply in prior_history):
+                    # The judge sees only the actual chat, never the testing/system prompt.
+                    async with AsyncOpenAI(api_key=api_key) as checker:
+                        ready = await self._has_adequate_context(checker, prior_history)
+                if not ready:
+                    await self._reply_to_evaluation_request(
+                        supabase, conversation_id, question, generation,
+                        INSUFFICIENT_CONTEXT_REPLY,
+                    )
+                    return
+
             if not conversation_id:
                 conversation_id = await asyncio.to_thread(
                     create_conversation, supabase, user_id, "New conversation"
@@ -211,7 +286,7 @@ class State(rx.State):
             user_saved = True
 
             async with AsyncOpenAI(api_key=api_key) as openai:
-                if question.lower() == "evaluate":
+                if is_evaluation:
                     situation_path = await self._extract_dilemma(openai, messages)
                     evaluation_path = Path(situation_path).parent / "evaluation.json"
 
@@ -239,6 +314,7 @@ class State(rx.State):
                             return
                         self.dilemma_json = Path(situation_path).read_text(encoding="utf-8")
                         self.dilemma_panel_open = True
+                        self.evaluated = True
                     messages.append({
                         "role": "system",
                         "content": EXPLAIN_PROMPT.format(
@@ -327,11 +403,20 @@ class State(rx.State):
                         # Naming is optional; it must never fail the chat reply.
                         logger.exception("Could not generate or save conversation title")
 
+        except AlreadyEvaluatedError:
+            # Another tab may have completed the evaluation after our initial check.
+            await self._reply_to_evaluation_request(
+                supabase, conversation_id, question, generation,
+                REPEAT_EVALUATION_REPLY, evaluated=True, user_saved=user_saved,
+            )
         except APIError:
             logger.exception("OpenAI request failed")
             async with self:
                 if self.chat_generation == generation:
                     self.error = "The request failed. Check your API access and try again."
+                    if not user_saved:
+                        self.chat_history.pop()
+                        self.question = question
         except Exception:
             logger.exception("Chat processing or persistence failed")
             async with self:
@@ -360,6 +445,38 @@ class State(rx.State):
                 if self.chat_generation == generation:
                     self.processing = False
             yield
+
+    async def _has_adequate_context(
+        self, client: AsyncOpenAI, history: list[tuple[str, str]]
+    ) -> bool:
+        """Check whether user-provided facts are sufficient for ethical evaluation."""
+        transcript = "\n".join(
+            f"User: {user[:1200]}\nAssistant: {reply[:600]}"
+            for user, reply in history
+        )[-9000:]
+        response = await client.chat.completions.create(
+            model=MODEL,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a conservative readiness checker for a moral dilemma evaluator. "
+                        "Reply READY only if the USER has provided enough concrete facts "
+                        "to identify a moral decision (including a yes/no choice), "
+                        "the alternatives, the affected parties, and their foreseeable "
+                        "outcomes for act-utilitarian and Kantian humanity evaluations. "
+                        "A greeting, abstract ethics question, or a scenario that requires "
+                        "inventing important facts is NOT_READY. Do not treat suggestions "
+                        "made solely by the assistant as user-provided facts. "
+                        "Output exactly READY or NOT_READY and nothing else."
+                    ),
+                },
+                {"role": "user", "content": transcript},
+            ],
+            temperature=0,
+            max_completion_tokens=8,
+        )
+        return (response.choices[0].message.content or "").strip() == "READY"
 
     async def _generate_conversation_title(
         self, client: AsyncOpenAI, messages: list[dict[str, str]]
