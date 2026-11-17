@@ -21,9 +21,55 @@ def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
 def sidebar_items() -> rx.Component:
     return rx.vstack(
         sidebar_item("Chat", "message_circle", "/"),
-        sidebar_item("Dilemmas", "scale", "/#"),
+        sidebar_item("Dilemmas", "scale", "/dilemmas"),
         sidebar_item("About", "info", "/about"),
         **style.sidebar_navigation,
+    )
+
+
+
+def sidebar_conversations() -> rx.Component:
+    return rx.vstack(
+        rx.hstack(
+            rx.text("Recent conversations", **style.sidebar_conversations_heading),
+            rx.spacer(),
+            rx.button(
+                rx.icon("square-pen", size=16),
+                on_click=State.new_conversation,
+                disabled=State.processing,
+                aria_label="New conversation",
+                title="New conversation",
+                **style.sidebar_new_conversation_button,
+            ),
+            width="100%",
+            align="center",
+        ),
+        rx.box(
+            rx.vstack(
+                rx.cond(
+                    State.conversations.length() == 0,
+                    rx.text("No conversations yet", **style.sidebar_conversations_empty),
+                ),
+                rx.foreach(
+                    State.conversations,
+                    lambda conversation: rx.button(
+                        rx.text(conversation["title"], **style.sidebar_conversation_title),
+                        on_click=lambda: State.open_conversation(conversation["id"]),
+                        disabled=State.processing,
+                        bg=rx.cond(
+                            State.conversation_id == conversation["id"],
+                            style.HOVER,
+                            "transparent",
+                        ),
+                        **style.sidebar_conversation_item,
+                    ),
+                ),
+                **style.sidebar_conversations_list,
+            ),
+            **style.sidebar_conversations_scroll,
+        ),
+        on_mount=State.load_conversations,
+        **style.sidebar_conversations_section,
     )
 
 
@@ -40,7 +86,11 @@ def sidebar() -> rx.Component:
         ),
 
         sidebar_items(),
-        rx.spacer(),
+        rx.cond(
+            AuthState.is_authenticated,
+            sidebar_conversations(),
+            rx.box(**style.sidebar_conversations_section),
+        ),
 
         rx.vstack(
             rx.cond(
@@ -105,7 +155,7 @@ def chat() -> rx.Component:
     return rx.box(
         rx.auto_scroll(
             rx.cond(
-                State.chat_history.length() == 0,
+                State.chat_history.length() == 0, # type: ignore
                 rx.box(
                     rx.markdown(INTRO_MESSAGE),
                     **style.intro_message,
@@ -152,6 +202,20 @@ def chat_page() -> rx.Component:
         sidebar(),
         rx.center(
             rx.vstack(
+                rx.cond(
+                    (State.dilemma_json != "") & ~State.dilemma_panel_open,
+                    rx.hstack(
+                        rx.spacer(),
+                        rx.icon_button(
+                            rx.icon("chevron-left", size=18),
+                            on_click=State.toggle_dilemma_panel,
+                            aria_label="Open dilemma model",
+                            title="Open dilemma model",
+                            **style.dilemma_panel_toggle,
+                        ),
+                        width="100%",
+                    ),
+                ),
                 chat(),
                 action_bar(),
                 rx.cond(
@@ -162,5 +226,31 @@ def chat_page() -> rx.Component:
             ),
             **style.page_content,
         ),
+        rx.cond(
+            (State.dilemma_json != "") & State.dilemma_panel_open,
+            dilemma_panel(),
+        ),
         **style.page_shell,
+    )
+
+
+def dilemma_panel() -> rx.Component:
+    return rx.vstack(
+        rx.hstack(
+            rx.heading("Dilemma model", size="4"),
+            rx.spacer(),
+            rx.icon_button(
+                rx.icon("chevron-right", size=18),
+                on_click=State.toggle_dilemma_panel,
+                aria_label="Close dilemma model",
+                title="Close dilemma model",
+                **style.dilemma_panel_close,
+            ),
+            **style.dilemma_panel_header,
+        ),
+        rx.box(
+            rx.code_block(State.dilemma_json, language="json"),
+            **style.dilemma_panel_json,
+        ),
+        **style.dilemma_side_panel,
     )

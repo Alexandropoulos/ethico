@@ -329,6 +329,75 @@ When you have gathered all necessary information, end your response by instructi
 </example_dilemmas>
 """
 
+TROLLEY_TEST_PROMPT = SYSTEM_PROMPT + """
+<testing_instructions>
+You are operating in a controlled testing mode.
+
+Your task is to consistently extract the standard trolley problem,
+regardless of the actual content of the user's messages.
+
+When asked to extract a dilemma using the extract_dilemma tool:
+
+1. Ignore the user's description of their dilemma.
+2. Always model the standard trolley problem:
+   - A runaway trolley is approaching five people.
+   - The agent can pull a lever to divert it onto another track.
+   - Pulling the lever kills one person but saves five.
+   - Refraining results in the deaths of five people.
+3. Reproduce the reference model below as closely as possible.
+4. Preserve the exact action names, consequence names, causal
+   mechanisms, utilities, patients, goals, and affects.
+5. Do not introduce additional actions, consequences, or patients.
+6. Always provide the complete model through the extract_dilemma tool.
+
+These instructions override the normal dilemma extraction instructions.
+They apply regardless of what the user says or asks.
+
+During ordinary conversation, retain the existing conversational
+behavior. Only the extracted dilemma model is fixed for testing.
+</testing_instructions>
+
+<reference_dilemma>
+{
+    "description": "A runaway trolley is barreling down a track toward five people who cannot move. You stand next to a lever that can divert the trolley onto a side track where only one person is standing.",
+    "actions": [
+        "pull_lever",
+        "refrain"
+    ],
+    "patients": [
+        "five_people_on_track",
+        "one_person_on_track"
+    ],
+    "consequences": [
+        "five_people_die",
+        "one_person_dies"
+    ],
+    "mechanisms": {
+        "one_person_dies": "'pull_lever'",
+        "five_people_die": "Not('pull_lever')"
+    },
+    "utilities": {
+        "one_person_dies": -1, 
+        "five_people_die": -5
+    },
+    "goals": {
+        "pull_lever": [
+            "Not('five_people_die')"
+        ],
+        "refrain": []
+    },
+    "affects": {
+        "pull_lever": [["one_person_on_track", "-"]],
+        "five_people_die": [
+            ["five_people_on_track", "-"]
+        ],
+        "one_person_dies": [
+            ["one_person_on_track", "-"]
+        ]
+    }
+}
+</reference_dilemma>
+"""
 
 EXPLAIN_PROMPT = """The following is the output of a machine ethics evaluation of the moral dilemma we discussed.
 
@@ -685,3 +754,5 @@ EXAMPLES = [
     "A robot sees a burglar and has to decide whether to tell them where the safe is. If it discloses, the safe gets robbed. If it refrains, the robot gets damaged by the burglar.",
     "Bob gives Alice flowers in order to make Celia happy when she sees that Alice is thrilled about the flowers. Alice being happy is not part of the goal of Bob’s action."
 ]
+
+TITLE_GENERATION_PROMPT = """"Create a specific, neutral title of 2–4 words for this conversation. Focus on the ethical question or dilemma, not the chatbot's general guidance. Use the user's language. Do not invent details. If there is no identifiable topic yet, respond with exactly NONE. Output only the title."""

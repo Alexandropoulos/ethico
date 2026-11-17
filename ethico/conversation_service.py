@@ -21,6 +21,47 @@ def create_conversation(client: Client, user_id: str, title: str) -> str:
     })
 
 
+
+def list_conversations(client: Client, user_id: str) -> list[dict[str, str]]:
+    """Return the user's conversations, newest first."""
+    response = (
+        client.table("conversations")
+        .select("id, title")
+        .eq("user_id", user_id)
+        .order("created_at", desc=True)
+        .execute()
+    )
+    return [
+        {"id": str(row["id"]), "title": row["title"]}
+        for row in (response.data or [])
+    ]
+
+
+def list_messages(
+    client: Client, user_id: str, conversation_id: str
+) -> list[dict[str, str]]:
+    """Fetch messages in chronological order after checking ownership."""
+    conversation = (
+        client.table("conversations")
+        .select("id")
+        .eq("id", conversation_id)
+        .eq("user_id", user_id)
+        .limit(1)
+        .execute()
+    )
+    if not conversation.data:
+        raise ValueError("Conversation not found.")
+
+    response = (
+        client.table("messages")
+        .select("role, content")
+        .eq("conversation_id", conversation_id)
+        .order("created_at")
+        .execute()
+    )
+    return response.data or []
+
+
 def save_message(
     client: Client, conversation_id: str, role: str, content: str
 ) -> str:
@@ -45,6 +86,23 @@ def _update_conversation(
     )
     if not response.data:
         raise RuntimeError("Could not update the conversation.")
+
+
+def set_conversation_title(
+    client: Client, user_id: str, conversation_id: str, title: str
+) -> None:
+    """Name a user's as-yet untitled conversation without overwriting a rename."""
+    response = (
+        client.table("conversations")
+        .update({"title": title})
+        .eq("id", conversation_id)
+        .eq("user_id", user_id)
+        .eq("title", "New conversation")
+        .select("id")
+        .execute()
+    )
+    if not response.data:
+        raise RuntimeError("Could not update conversation title.")
 
 
 def save_situation(

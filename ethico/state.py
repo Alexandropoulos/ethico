@@ -10,12 +10,21 @@ from dotenv import load_dotenv
 from openai import APIError, AsyncOpenAI
 
 from ethico.auth_state import AuthState
-from ethico.constants import EXPLAIN_PROMPT, OPENAI_TOOLS, SYSTEM_PROMPT
+from ethico.constants import (
+    EXPLAIN_PROMPT, 
+    OPENAI_TOOLS, 
+    SYSTEM_PROMPT,
+    TITLE_GENERATION_PROMPT,
+    TROLLEY_TEST_PROMPT
+)
 from ethico.conversation_service import (
     create_conversation,
+    list_conversations,
+    list_messages,
     save_evaluation,
     save_message,
     save_situation,
+    set_conversation_title,
 )
 from ethico.evaluator import evaluate_dilemma
 from ethico.validator import UnifiedModel
@@ -31,25 +40,116 @@ class State(rx.State):
     chat_history: list[tuple[str, str]] = []
     processing: bool = False
     error: str = ""
-
+    dilemma_json: str = ""
+    dilemma_panel_open: bool = False
+    
     conversation_id: str = ""
+    conversations: list[dict[str, str]] = []
 
-    # Incremented on login/logout so an old streaming event cannot
-    # write into a different user's freshly cleared chat.
+    # Incremented whenever chats or users change so an old stream cannot
+    # write into a different conversation.
     chat_generation: int = 0
 
     @rx.event
     def set_question(self, value: str):
         self.question = value
 
+    @rx.event
+    def toggle_dilemma_panel(self):
+        self.dilemma_panel_open = not self.dilemma_panel_open
+
     def _clear_chat(self):
         """Called by AuthState on login and logout."""
         self.question = ""
         self.chat_history = []
+        self.dilemma_json = ""
+        self.dilemma_panel_open = False
         self.processing = False
         self.error = ""
         self.conversation_id = ""
+        self.conversations = []
         self.chat_generation += 1
+
+    @rx.event
+    async def load_conversations(self):
+        """Refresh the sidebar from the current user's conversations."""
+        auth = await self.get_state(AuthState)
+        try:
+            client = auth._authenticated_client()
+            user_id = auth.user_id
+            generation = self.chat_generation
+            rows = await asyncio.to_thread(list_conversations, client, user_id)
+            if self.chat_generation == generation:
+                self.conversations = rows
+        except Exception:
+            logger.exception("Could not load conversations")
+            self.error = "Could not load your conversations."
+
+    @rx.event
+    async def open_conversation(self, conversation_id: str):
+        """Switch chat context to the selected conversation."""
+        if self.processing:
+            return
+        if self.conversation_id == conversation_id:
+            return rx.redirect("/")
+
+        auth = await self.get_state(AuthState)
+        try:
+            client = auth._authenticated_client()
+            user_id = auth.user_id
+            generation = self.chat_generation
+            rows = await asyncio.to_thread(
+                list_messages, client, user_id, conversation_id
+            )
+            # The saved dilemma belongs to the conversation, not its messages.
+            record = await asyncio.to_thread(
+                lambda: client.table("conversations")
+                .select("dilemma,evaluation")
+                .eq("id", conversation_id)
+                .eq("user_id", user_id)
+                .single()
+                .execute()
+            )
+            if self.chat_generation != generation:
+                return
+        except Exception:
+            logger.exception("Could not open conversation")
+            self.error = "Could not open this conversation."
+            return
+
+        history: list[tuple[str, str]] = []
+        for message in rows:
+            role, content = message["role"], message["content"]
+            if role == "user":
+                history.append((content, ""))
+            elif role == "assistant" and history:
+                question, answer = history[-1]
+                history[-1] = (question, answer + content)
+
+        self.chat_history = history
+        saved = record.data or {}
+        dilemma = saved.get("dilemma") if saved.get("evaluation") is not None else None
+        self.dilemma_json = json.dumps(dilemma, indent=2, ensure_ascii=False) if dilemma is not None else ""
+        self.dilemma_panel_open = bool(self.dilemma_json)
+        self.conversation_id = conversation_id
+        self.question = ""
+        self.error = ""
+        self.chat_generation += 1
+        return rx.redirect("/")
+
+    @rx.event
+    def new_conversation(self):
+        """Start a fresh chat without removing the sidebar history."""
+        if self.processing:
+            return
+        self.conversation_id = ""
+        self.chat_history = []
+        self.dilemma_json = ""
+        self.dilemma_panel_open = False
+        self.question = ""
+        self.error = ""
+        self.chat_generation += 1
+        return rx.redirect("/")
 
     @rx.event(background=True)
     async def answer(self):
@@ -88,12 +188,16 @@ class State(rx.State):
         try:
             if not conversation_id:
                 conversation_id = await asyncio.to_thread(
-                    create_conversation, supabase, user_id, question[:80]
+                    create_conversation, supabase, user_id, "New conversation"
                 )
                 async with self:
                     if self.chat_generation != generation:
                         return
                     self.conversation_id = conversation_id
+                    self.conversations.insert(0, {
+                        "id": conversation_id,
+                        "title": "New conversation",
+                    })
                 yield
 
             async with self:
@@ -125,10 +229,16 @@ class State(rx.State):
                     )
                     with open(evaluation_path, encoding="utf-8") as f:
                         evaluation = json.load(f)
-
+                    
                     await asyncio.to_thread(
                         save_evaluation, supabase, conversation_id, evaluation
                     )
+
+                    async with self:
+                        if self.chat_generation != generation:
+                            return
+                        self.dilemma_json = Path(situation_path).read_text(encoding="utf-8")
+                        self.dilemma_panel_open = True
                     messages.append({
                         "role": "system",
                         "content": EXPLAIN_PROMPT.format(
@@ -172,6 +282,51 @@ class State(rx.State):
                 )
                 assistant_saved = True
 
+                # Title only conversations that have not yet been named.
+                # A generic opener should not become a misleading title.
+                async with self:
+                    needs_title = (
+                        self.chat_generation == generation
+                        and any(
+                            c["id"] == conversation_id
+                            and c["title"] == "New conversation"
+                            for c in self.conversations
+                        )
+                    )
+
+                if needs_title and question.lower().strip(" !?.") not in {
+                    "hi", "hello", "hey", "thanks", "thank you", "γεια", "γειά",
+                }:
+                    try:
+                        title_messages = [
+                            *messages,
+                            {"role": "assistant", "content": "".join(answer_parts)},
+                        ]
+                        async with AsyncOpenAI(
+                            api_key=api_key, timeout=8.0, max_retries=0
+                        ) as title_client:
+                            title = await self._generate_conversation_title(
+                                title_client, title_messages
+                            )
+                        if title:
+                            await asyncio.to_thread(
+                                set_conversation_title,
+                                supabase, user_id, conversation_id, title,
+                            )
+                            async with self:
+                                if self.chat_generation == generation:
+                                    self.conversations = [
+                                        {**c, "title": title}
+                                        if c["id"] == conversation_id
+                                        and c["title"] == "New conversation"
+                                        else c
+                                        for c in self.conversations
+                                    ]
+                            yield
+                    except Exception:
+                        # Naming is optional; it must never fail the chat reply.
+                        logger.exception("Could not generate or save conversation title")
+
         except APIError:
             logger.exception("OpenAI request failed")
             async with self:
@@ -206,8 +361,36 @@ class State(rx.State):
                     self.processing = False
             yield
 
+    async def _generate_conversation_title(
+        self, client: AsyncOpenAI, messages: list[dict[str, str]]
+    ) -> str:
+        """Summarize the first meaningful exchange into a sidebar title."""
+        transcript = "\n".join(
+            f"{m['role']}: {m['content'][:500]}"
+            for m in messages if m["role"] in {"user", "assistant"}
+        )[-2500:]
+        response = await client.chat.completions.create(
+            model=MODEL,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (TITLE_GENERATION_PROMPT),
+                },
+                {"role": "user", "content": transcript},
+            ],
+            temperature=0.2,
+            max_completion_tokens=32,
+        )
+        title = (response.choices[0].message.content or "").split("\n", 1)[0]
+        title = title.strip().strip('"\'`').strip()
+        if not title or title.upper() == "NONE":
+            return ""
+        if len(title) > 60:
+            title = title[:60].rsplit(" ", 1)[0] or title[:60]
+        return title
+
     def _create_message_list(self) -> list[dict[str, str]]:
-        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        messages = [{"role": "system", "content": TROLLEY_TEST_PROMPT}]
         for previous_question, previous_answer in self.chat_history:
             messages.append({"role": "user", "content": previous_question})
             if previous_answer:

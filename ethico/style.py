@@ -1,8 +1,3 @@
-"""Monochrome visual system for the Ethico / THUFIR Reflex interface.
-
-Adjust the tokens here to change the entire application consistently.
-Uses Radix slate tokens, which adapt to light/dark appearance.
-"""
 import reflex as rx
 
 NEUTRAL = "slate"
@@ -30,8 +25,8 @@ error_text = dict(color=rx.color("red", 11), size="2")
 
 # Navigation: quiet neutral sidebar, no colored accent.
 sidebar_container = dict(spacing="5", padding_x="0.85rem", padding_y="1.4rem", bg=SIDEBAR_BG,
-    align="start", position="fixed", top="0", left="0", height="100dvh",
-    width=SIDEBAR_WIDTH, overflow_y="auto", z_index="10", border_right=f"1px solid {BORDER}")
+    align="stretch", position="fixed", top="0", left="0", height="100dvh",
+    width=SIDEBAR_WIDTH, overflow="hidden", z_index="10", border_right=f"1px solid {BORDER}")
 sidebar_brand_row = dict(align="center", justify="start", padding_x="0.65rem", width="100%", spacing="3")
 sidebar_logo = dict(size=23, color=TEXT)
 sidebar_heading = dict(as_="h2", size="5", weight="bold", letter_spacing="-0.025em")
@@ -40,6 +35,22 @@ sidebar_link_style = dict(underline="none", weight="medium", width="100%", color
 sidebar_link_row = dict(width="100%", padding_x="0.75rem", padding_y="0.7rem", align="center", spacing="3",
     border_radius=RADIUS_SMALL, _hover={"bg": HOVER})
 sidebar_link_text = dict(size="3")
+sidebar_conversations_section = dict(width="100%", flex="1", min_height="0", spacing="2", align="stretch")
+sidebar_conversations_heading = dict(size="2", weight="medium", color=MUTED, padding_x="0.75rem")
+sidebar_new_conversation_button = dict(variant="ghost", color_scheme="gray", size="1", padding="0.4rem")
+sidebar_conversations_scroll = dict(width="100%", flex="1", min_height="0", overflow_y="auto", overflow_x="hidden")
+sidebar_conversations_list = dict(width="100%", max_width="100%", spacing="1", align="stretch")
+sidebar_conversation_item = dict(
+    variant="ghost", color_scheme="gray", width="100%", max_width="100%", min_width="0",
+    height="36px", padding_x="0.75rem", justify_content="flex-start", text_align="left",
+    border_radius=RADIUS_SMALL, cursor="pointer", overflow="hidden", flex_shrink="0",
+    _hover={"bg": HOVER},
+)
+sidebar_conversation_title = dict(
+    size="2", color=TEXT, width="100%", min_width="0", text_align="left",
+    overflow="hidden", text_overflow="ellipsis", white_space="nowrap",
+)
+sidebar_conversations_empty = dict(size="2", color=MUTED, padding="0.75rem")
 sidebar_footer = dict(width="100%", spacing="4")
 sidebar_logout = dict(variant="ghost", color_scheme="gray", width="100%", justify="start")
 sidebar_account_row = dict(padding_x="0.5rem", align="center", justify="start", width="100%")
@@ -90,3 +101,71 @@ login_input = dict(width="100%", color_scheme="gray")
 login_button = dict(width="100%", color_scheme="gray", high_contrast=True)
 login_secondary_button = dict(variant="outline", color_scheme="gray", width="100%")
 login_error = dict(color=rx.color("red", 11))
+
+# Dilemmas page: compact two-panel library; all style choices live here.
+dilemma_panels = dict(
+    flex="1", margin_left=SIDEBAR_WIDTH, height="100dvh", min_width="0",
+    align="stretch", spacing="0", overflow="hidden",
+)
+dilemma_list_panel = dict(
+    width="22rem", flex_shrink="0", height="100%", min_height="0",
+    padding="1.5rem 1rem", align="stretch", spacing="4",
+    overflow_y="auto", bg=SIDEBAR_BG, border_right=f"1px solid {BORDER}",
+)
+dilemma_page_heading = dict(size="6", weight="bold")
+dilemma_search = dict(width="100%", color_scheme="gray", variant="surface")
+dilemma_items = dict(spacing="2", align="stretch", width="100%")
+dilemma_item = dict(
+    width="100%", height="auto", padding="0.85rem", justify="start",
+    white_space="normal", text_align="left", color=TEXT,
+    border_radius=RADIUS_SMALL, cursor="pointer", variant="ghost",
+    _hover={"bg": HOVER},
+)
+dilemma_item_title = dict(weight="medium", size="3", overflow_wrap="anywhere")
+dilemma_item_description = dict(
+    size="2", color=MUTED, overflow="hidden", display="-webkit-box",
+    **{"-webkit-line-clamp": "2", "-webkit-box-orient": "vertical"},
+)
+dilemma_item_date = dict(size="1", color=MUTED)
+dilemma_detail_panel = dict(
+    flex="1", min_width="0", height="100%", padding="1.5rem 2rem",
+    overflow_y="auto", bg=BG,
+)
+dilemma_detail_body = dict(
+    spacing="6", align="stretch", width="100%", max_width="65rem",
+    margin_x="auto", padding_bottom="3rem",
+)
+dilemma_detail_header = dict(width="100%", align="start", justify="between", spacing="3")
+dilemma_title = dict(size="7", weight="bold", overflow_wrap="anywhere")
+dilemma_open_button = dict(variant="outline", color_scheme="gray", flex_shrink="0")
+dilemma_section = dict(spacing="3", align="stretch", width="100%", border_top=f"1px solid {BORDER}", padding_top="1.25rem")
+dilemma_section_heading = dict(size="4", weight="bold")
+dilemma_description = dict(size="3", line_height="1.75", color=TEXT, overflow_wrap="anywhere")
+dilemma_field = dict(spacing="2", align="stretch", width="100%")
+dilemma_field_label = dict(size="2", weight="medium", color=MUTED)
+dilemma_chip = dict(
+    size="2", padding="0.35rem 0.6rem", bg=SURFACE,
+    border_radius="7px", font_family="monospace", overflow_wrap="anywhere",
+)
+dilemma_map = dict(spacing="0", width="100%", align="stretch", border=f"1px solid {BORDER}", border_radius=RADIUS_SMALL, overflow="hidden")
+dilemma_map_row = dict(spacing="1", width="100%", padding="0.75rem", align="stretch", border_bottom=f"1px solid {BORDER}")
+dilemma_map_key = dict(font_family="monospace", size="2", weight="medium", color=TEXT, overflow_wrap="anywhere")
+dilemma_map_value = dict(font_family="monospace", size="2", white_space="pre-wrap", color=MUTED, overflow_wrap="anywhere")
+dilemma_empty_field = dict(color=MUTED, size="2")
+dilemma_placeholder = dict(color=MUTED, size="3", padding="1rem")
+# Right-side dilemma model inspector
+dilemma_side_panel = dict(
+    width="26rem", max_width="38vw", flex_shrink="0", height="100dvh",
+    min_height="0", spacing="0", align="stretch", bg=SIDEBAR_BG,
+    border_left=f"1px solid {BORDER}", overflow="hidden",
+)
+dilemma_panel_header = dict(
+    width="100%", align="center", padding="1rem 1.25rem",
+    border_bottom=f"1px solid {BORDER}",
+)
+dilemma_panel_close = dict(variant="ghost", color_scheme="gray", size="2")
+dilemma_panel_json = dict(
+    width="100%", flex="1", min_height="0", overflow="auto",
+    padding="1rem",
+)
+dilemma_panel_toggle = dict(variant="ghost", color_scheme="gray", size="2")
