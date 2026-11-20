@@ -9,9 +9,10 @@ The application requires GNU/Linux or Windows with WSL (Windows Subsystem for Li
    cd ethico
    ```
 
-2. **Install uv** (if not already installed):
+2. **Install uv and essential packages** (if not already installed):
    ```bash
    curl -LsSf https://astral.sh/uv/install.sh | sh
+   sudo apt install -y build-essential python3-dev unzip
    ```
 
 3. **Install project dependencies:**
@@ -32,6 +33,7 @@ The application requires GNU/Linux or Windows with WSL (Windows Subsystem for Li
    ```bash
    source .venv/bin/activate
    cd ethics_engine
+   chmod +x ./cudd-3.0.0/configure
    python3 setup.py install
    cd ..
    deactivate
