@@ -726,8 +726,8 @@ Finally, in the **explanation stage** the ethics engine has completed the evalua
 **THUFIR’**s goal is to provide clarity and new perspectives rather than concrete guidance. Users may find the system’s questions, evaluations and explanations useful for guiding their own thoughts, but the choice always remains up to humans, as does the responsibility for it.
 """
 
-DILEMMA_INTRO = """
-Your dilemma model will appear below after its evaluation. You may inspect it to make sure that it captures the essence of your dilemma:
+DILEMMA_PANEL_INTRO = """
+The dilemma model that was extracted from your descriptions appears below. You may inspect it in order to make sure that it accurately captures the essence of your dilemma:
 """
 
 DILEMMA_FOLLOWUP = """
