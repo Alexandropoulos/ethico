@@ -1,11 +1,4 @@
 # THUFIR - A VIrtual Ethics Advisor
-**THUFIR** is a hybrid machine ethics system that helps users navigate moral dilemmas.
-
-It integrates an LLM to converse with users and a mdodified version of the HERA Python library for moral reasoning.
-
-THUFIR is currently not publicly available as a web-app, but can be run locally by cloning the repo and providing access to an LLM through API keys.
-
-
 ## Setup
 
 The application requires GNU/Linux or Windows with WSL (Windows Subsystem for Linux). Python dependencies are managed using [uv](https://docs.astral.sh/uv/).
@@ -50,3 +43,36 @@ The application requires GNU/Linux or Windows with WSL (Windows Subsystem for Li
    ```
 
    The application will typically be accessible at `http://localhost:3000`.
+
+
+## System Description
+
+The system is designed as an interactive and transparent ethics advisor. It combines an LLM-powered chatbot, which elicits information about moral dilemmas from users, with a deterministic ethics engine that formally models and evaluates those dilemmas.
+
+The system aims to help users understand and evaluate moral dilemmas, as well as explore the ethical theories that can be applied to moral decision-making.
+
+### Scope
+
+The system is limited to moral dilemmas that can be represented within HERA's formalism. The LLM-powered chatbot is responsible for identifying and enforcing these constraints during user interactions.
+
+A dilemma must satisfy the following conditions to be modeled and evaluated:
+
+1. **Binary choice:** The dilemma involves exactly two alternatives: performing an action or refraining from it.
+2. **Known action:** The action under consideration is clearly identified.
+3. **Known consequences:** The consequences of the action are known.
+4. **Known causal relationships:** The causal links between the action and its consequences are established.
+5. **Comparable utilities:** The utility of each consequence can be ranked relative to the others.
+6. **Identifiable moral patients:** The individuals or entities affected by the action are known.
+7. **Identifiable agent goals:** The agent's goals can be determined from the dilemma's description.
+8. **Deterministic outcomes:** Probabilistic or uncertain outcomes are excluded; each consequence either occurs or does not.
+
+Dilemmas that do not satisfy these conditions fall outside the system's scope and cannot be formally evaluated.
+
+## **Ethical Frameworks**
+
+The system implements two ethical principles:
+
+- **Act Utilitarianism:** Evaluates actions according to their consequences for overall utility.
+- **Kantian Humanity Principle:** Evaluates whether an action respects persons as ends in themselves rather than treating them merely as means.
+
+These principles were selected because they represent distinct ethical approaches and can produce divergent evaluations of the same dilemma.
