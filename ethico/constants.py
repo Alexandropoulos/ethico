@@ -711,19 +711,19 @@ Follow these rules:
 SYSTEM_INFORMATION = """
 **In a nutshell**
 
-**THUFIR** is a virtual ethics advisor that helps you navigate moral dilemmas. You can discuss your dilemma with **THUFIR** through the chatbot interface. The system will inform you when it has gathered enough context about your dilemma, and you may then request its evaluation. **THUFIR** will explain how the dilemma would be evaluated by the ethical principles of act-utilitarianism and the Kantian Humanity Formula. You may then ask any question about the results of the evaluation, or describe a new dilemma that you would like **THUFIR** to help you explore.
+**THUFIR** is a virtual ethics advisor that can help users articulate and navigate moral dilemmas. Users can create a new chat and start explaining their dilemma. **THUFIR** will inform users when adequate information about their dilemma has been collected, so that they may then request an evaluation. **THUFIR** will model and evaluate their moral dilemma using its built-in ethics engine, and then present the evaluation results following the ethical principles of Act-Utilitarianism and the Kantian Humanity Formula. Finally, users may continue chatting with **THUFIR** if they wish to gain a better understanding of the dilemma or its evaluation.
 
 **In more detail**
 
-**THUFIR** is a hybrid machine ethics system. It combines a Large Language Model (LLM) as its data-driven, bottom-up component and the HERA Python library for ethical reasoning as its verifiable, top-down component.
+**THUFIR** is a hybrid machine ethics system. It consists of two components—a Large Language Model (LLM) as its data-driven, bottom-up component, and the HERA Python library as its verifiable, top-down component. The flow of every typical user interaction with THUFIR can be broken into three stages: the extraction, the evaluation, and the explanation stage.
 
-**THUFIR**’s LLM component powers the chatbot interface you use to converse with the system. Its main task is to collect all relevant moral context about your dilemma, clarify ambiguities, and construct a structured dilemma model. The aim of this extraction stage is to translate your description into a format that can be processed and evaluated by the HERA library.
+The aim of the **extraction stage** is to structure the dilemma information in a way that can be processed and evaluated by the ethics engine. During this stage, **THUFIR** aims to elicit moral context about the user’s dilemma, to clarify ambiguities in the provided descriptions, and to use the  information provided by the user to construct a valid dilemma model. 
 
-In the **evaluation stage**, the dilemma model is processed by **THUFIR**’s ethics engine using two core ethical principles: act-utilitarianism and the Kantian Humanity Formula. Act-utilitarianism evaluates the action based on which option produces the best overall consequences. Kant’s Humanity Formula examines whether the action treats people merely as means rather than as ends in themselves.
+In the **evaluation stage**, the dilemma model is evaluated by the ethics engine, which implements the ethical principles of Act-Utilitarianism and the Kantian Humanity Formula. Each principle uses different components of the dilemma model to evaluate the moral permissibility of the agent’s deliberated action. The utilitarian module will only decide based on the consequences of the action, whereas the Kantian module will also rely on the agent’s goals and how the action’s consequences affect each moral patient.
 
-In the **explanation stage**, **THUFIR** presents the results in clear natural language. The system details the reasoning behind each evaluation, compares the conclusions of the two principles, and provides a high-level overview of their theoretical foundations. You may then ask follow-up questions to better understand **THUFIR**’s evaluations and conclusions. You can also request the evaluation of a modified version of your dilemma or an entirely different one.
+Finally, in the **explanation stage** the ethics engine has completed the evaluation of the user’s dilemma and the LLM component ****explains it. The system exposes the moral reasons that contribute to each principle’s evaluation results, compares these evaluations, and provides a high-level overview of the ethical theories that underpin the implemented moral principles. The user is then free to continue conversing with **THUFIR**, in order to better understand **THUFIR**’s evaluations or explanations. 
 
-**THUFIR**’s goal is to provide clarity and guidance. You may find the perspectives offered by the implemented ethical principles provide illuminating, but the final choice in any moral dilemma remains yours, as does the responsibility for it.
+**THUFIR’**s goal is to provide clarity and new perspectives rather than concrete guidance. Users may find the system’s questions, evaluations and explanations useful for guiding their own thoughts, but the choice always remains up to humans, as does the responsibility for it.
 """
 
 DILEMMA_INTRO = """
