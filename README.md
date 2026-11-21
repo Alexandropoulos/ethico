@@ -1,11 +1,11 @@
-# THUFIR - A VIrtual Ethics Advisor
+# THUFIR - A Virtual Ethics Advisor
 ## Setup
 
 The application requires GNU/Linux or Windows with WSL (Windows Subsystem for Linux). Python dependencies are managed using [uv](https://docs.astral.sh/uv/).
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/ethico.git
+   git clone https://github.com/ntua-el21040/ethico.git
    cd ethico
    ```
 
