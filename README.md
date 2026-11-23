@@ -1,5 +1,5 @@
 # THUFIR - A Virtual Ethics Advisor
-## Setup!
+## Setup
 
 The application requires GNU/Linux or Windows with WSL (Windows Subsystem for Linux). Python dependencies are managed using [uv](https://docs.astral.sh/uv/).
 
