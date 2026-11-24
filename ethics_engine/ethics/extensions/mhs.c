@@ -4,8 +4,8 @@
 {
     "distutils": {
         "depends": [
-            "/mnt/d/source/ethico/ethics_engine/cudd-3.0.0/cudd/cudd.h",
-            "/mnt/d/source/ethico/ethics_engine/cudd-3.0.0/cudd/cuddInt.h"
+            "/home/azureuser/ethico/ethics_engine/cudd-3.0.0/cudd/cudd.h",
+            "/home/azureuser/ethico/ethics_engine/cudd-3.0.0/cudd/cuddInt.h"
         ],
         "extra_compile_args": [
             "-fPIC",
@@ -21,22 +21,22 @@
             "-O3"
         ],
         "include_dirs": [
-            "/mnt/d/source/ethico/ethics_engine/cudd-3.0.0/.",
-            "/mnt/d/source/ethico/ethics_engine/cudd-3.0.0/cudd",
-            "/mnt/d/source/ethico/ethics_engine/cudd-3.0.0/epd",
-            "/mnt/d/source/ethico/ethics_engine/cudd-3.0.0/mtr",
-            "/mnt/d/source/ethico/ethics_engine/cudd-3.0.0/st",
-            "/mnt/d/source/ethico/ethics_engine/cudd-3.0.0/util"
+            "/home/azureuser/ethico/ethics_engine/cudd-3.0.0/.",
+            "/home/azureuser/ethico/ethics_engine/cudd-3.0.0/cudd",
+            "/home/azureuser/ethico/ethics_engine/cudd-3.0.0/epd",
+            "/home/azureuser/ethico/ethics_engine/cudd-3.0.0/mtr",
+            "/home/azureuser/ethico/ethics_engine/cudd-3.0.0/st",
+            "/home/azureuser/ethico/ethics_engine/cudd-3.0.0/util"
         ],
         "libraries": [
             "cudd"
         ],
         "library_dirs": [
-            "/mnt/d/source/ethico/ethics_engine/cudd-3.0.0/cudd/.libs"
+            "/home/azureuser/ethico/ethics_engine/cudd-3.0.0/cudd/.libs"
         ],
         "name": "ethics.extensions.mhs",
         "sources": [
-            "/mnt/d/source/ethico/ethics_engine/ethics/extensions/mhs.pyx"
+            "/home/azureuser/ethico/ethics_engine/ethics/extensions/mhs.pyx"
         ]
     },
     "module_name": "ethics.extensions.mhs"
