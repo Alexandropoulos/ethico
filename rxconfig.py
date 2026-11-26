@@ -2,6 +2,7 @@ import reflex as rx
 
 config = rx.Config(
     app_name="ethico",
+    show_built_with_reflex=False,
     backend_host="127.0.0.1",
     frontend_port=3000,
     api_url="https://ethico.duckdns.org",
