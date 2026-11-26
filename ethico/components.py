@@ -24,7 +24,18 @@ def sidebar_item(
 
 def sidebar_items() -> rx.Component:
     return rx.vstack(
-        sidebar_item("New", "plus", "/"),
+        rx.link(
+            rx.hstack(
+                rx.icon("plus"),
+                rx.text("New", **style.sidebar_link_text),
+                **style.sidebar_link_row,
+            ),
+            as_="button",
+            type="button",
+            on_click=State.new_conversation,
+            disabled=State.processing,
+            **style.sidebar_link_style,
+        ),
         sidebar_item("Dilemmas", "scale", "/dilemmas"),
         **style.sidebar_navigation,
     )
@@ -183,36 +194,6 @@ def action_bar() -> rx.Component:
             **style.action_bar_row,
         ),
         **style.action_bar_container,
-    )
-
-
-def chat_page() -> rx.Component:
-    """Shared layout for the main chat and dilemmas pages."""
-    return rx.hstack(
-        sidebar(),
-        rx.center(
-            rx.vstack(
-                chat(),
-                action_bar(),
-                rx.cond(
-                    State.error != "",
-                    rx.text(State.error, role="alert", **style.error_text),
-                ),
-                **style.chat_column,
-            ),
-            **style.page_content,
-        ),
-        rx.cond(
-            (State.dilemma_json != "") & ~State.dilemma_panel_open,
-            rx.button(
-                rx.icon("panel-right-open", size=17),
-                "Show dilemma model",
-                on_click=State.toggle_dilemma_panel,
-                aria_label="Show dilemma model",
-                **style.dilemma_panel_toggle,
-            ),
-        ),
-        **style.page_shell,
     )
 
 
