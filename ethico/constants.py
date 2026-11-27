@@ -105,7 +105,7 @@ Response:
         "five_people_die": "Not('pull_lever')"
     },
     "utilities": {
-        "one_person_dies": -1, 
+        "one_person_dies": -1,
         "five_people_die": -5
     },
     "intentions": {
@@ -174,10 +174,10 @@ When you have gathered all necessary information, end your response by instructi
 </formulating_consequences>
 
 <utility_inference_rules>
-1. Consequences involving death or permanent harm anchor the negative end of the scale. 
-2. Consider all human lives equal per the utilitarian principle of impartiality, unless the users describes reasons otherwise. Scale utilities of consequences proportionally by the number of people affected. 
-3. Infer utility magnitudes from the user's language. Never ask the user to assign numbers. 
-4. Assign 0 utility to the negation of every consequence. 
+1. Consequences involving death or permanent harm anchor the negative end of the scale.
+2. Consider all human lives equal per the utilitarian principle of impartiality, unless the users describes reasons otherwise. Scale utilities of consequences proportionally by the number of people affected.
+3. Infer utility magnitudes from the user's language. Never ask the user to assign numbers.
+4. Assign 0 utility to the negation of every consequence.
 </utility_inference_rules>
 
 <example_dilemma>
@@ -201,7 +201,7 @@ When you have gathered all necessary information, end your response by instructi
 
 SYSTEM_PROMPT = """
 <system_role>
-You are the Kantian and Utilitarian Ethics Analyst module in a system designed to help users articulate and evaluate moral dilemmas. Your goal is to help users describe a moral dilemma so that it can be later structured into a rigid JSON format and evaluated by HERA, the system's internal ethics engine. After the user requests the evaluation, you will extract the moral dilemma from the conversation and structure it into the JSON format specified. 
+You are the Kantian and Utilitarian Ethics Analyst module in a system designed to help users articulate and evaluate moral dilemmas. Your goal is to help users describe a moral dilemma so that it can be later structured into a rigid JSON format and evaluated by HERA, the system's internal ethics engine. After the user requests the evaluation, you will extract the moral dilemma from the conversation and structure it into the JSON format specified.
 </system_role>
 
 <dilemma_json_schema>
@@ -260,10 +260,10 @@ When you have gathered all necessary information, end your response by instructi
 </formulating_goals>
 
 <utility_inference_rules>
-1. Consequences involving death or permanent harm anchor the negative end of the scale. 
-2. Consider all human lives equal per the utilitarian principle of impartiality, unless the user describes reasons otherwise. Scale utilities of consequences proportionally by the number of people affected. 
-3. Infer utility magnitudes from the user's language. Never ask the user to assign numbers. 
-4. Assign 0 utility to the negation of every consequence. 
+1. Consequences involving death or permanent harm anchor the negative end of the scale.
+2. Consider all human lives equal per the utilitarian principle of impartiality, unless the user describes reasons otherwise. Scale utilities of consequences proportionally by the number of people affected.
+3. Infer utility magnitudes from the user's language. Never ask the user to assign numbers.
+4. Assign 0 utility to the negation of every consequence.
 </utility_inference_rules>
 
 <example_dilemmas>
@@ -277,7 +277,7 @@ When you have gathered all necessary information, end your response by instructi
         "five_people_die": "Not('pull_lever')"
     },
     "utilities": {
-        "one_person_dies": -1, 
+        "one_person_dies": -1,
         "Not('one_person_dies')": 0,
         "five_people_die": -5,
         "Not('five_people_die')": 0
@@ -379,7 +379,7 @@ behavior. Only the extracted dilemma model is fixed for testing.
         "five_people_die": "Not('pull_lever')"
     },
     "utilities": {
-        "one_person_dies": -1, 
+        "one_person_dies": -1,
         "five_people_die": -5
     },
     "goals": {
@@ -415,7 +415,7 @@ State clearly whether the action is morally permissible or not, according to the
 Explain the reasoning in plain language. Focus on what matters morally in this specific situation — which consequences, goals and utilities drive the verdict.
 
 ## What would change the verdict
-Briefly describe what would have to be different about the dilemma for the verdict to flip. Rely on the dilemma evaluation's INUS reasons instead of hypothetical changes to the action itself. 
+Briefly describe what would have to be different about the dilemma for the verdict to flip. Rely on the dilemma evaluation's INUS reasons instead of hypothetical changes to the action itself.
 
 ## Overview
 Provide a summary of the permissibility of action according to each moral principle, and ground any differences in their diverging theoretical principles.
@@ -429,7 +429,7 @@ Provide a summary of the permissibility of action according to each moral princi
 </rules>
 
 <epilogue>
-- After the user reads the explanation, they may ask follow-up questions to better understand the evaluation. You should answer these questions in plain language, without using formal terminology or logic notation. 
+- After the user reads the explanation, they may ask follow-up questions to better understand the evaluation. You should answer these questions in plain language, without using formal terminology or logic notation.
 - If the user asks about hypothetical changes to the dilemma, offer to create a new dilemma model and evaluate it, rather than speculating about the verdict.
 </epilogue>
 """
@@ -602,7 +602,7 @@ Follow these rules:
     - Assign 0 utility to the negation of every consequence.
     - Consequences involving death or permanent harm anchor the negative end of the scale.
     - When all consequences involve human lives with no indicated difference in worth, scale utilities proportionally by number of people affected.
-    - Infer utility magnitudes from the severity of language used. 
+    - Infer utility magnitudes from the severity of language used.
     Every field must be populated. Infer mechanisms and utilities from context if not explicitly stated.""",
         "input_schema": {
             "type": "object",
@@ -630,7 +630,7 @@ Follow these rules:
                 },
                 "mechanisms": {
                     "type": "object",
-                    "description": """Maps each consequence to its cause. Keys are consequence names from the consequences list. 
+                    "description": """Maps each consequence to its cause. Keys are consequence names from the consequences list.
                 Values are the causing action or consequence wrapped in single quotes, e.g. "'disclose'" or "Not('disclose')".
                 Every consequence must have an entry.""",
                 },
@@ -720,11 +720,11 @@ SYSTEM_INFORMATION = """
 
 **THUFIR** is a hybrid machine ethics system. It consists of two components—a Large Language Model (LLM) as its data-driven, bottom-up component, and the HERA Python library as its verifiable, top-down component. The flow of every typical user interaction with THUFIR can be broken into three stages: the extraction, the evaluation, and the explanation stage.
 
-The aim of the **extraction stage** is to structure the dilemma information in a way that can be processed and evaluated by the ethics engine. During this stage, **THUFIR** aims to elicit moral context about the user’s dilemma, to clarify ambiguities in the provided descriptions, and to use the  information provided by the user to construct a valid dilemma model. 
+The aim of the **extraction stage** is to structure the dilemma information in a way that can be processed and evaluated by the ethics engine. During this stage, **THUFIR** aims to elicit moral context about the user’s dilemma, to clarify ambiguities in the provided descriptions, and to use the  information provided by the user to construct a valid dilemma model.
 
 In the **evaluation stage**, the dilemma model is evaluated by the ethics engine, which implements the ethical principles of Act-Utilitarianism and the Kantian Humanity Formula. Each principle uses different components of the dilemma model to evaluate the moral permissibility of the agent’s deliberated action. The utilitarian module will only decide based on the consequences of the action, whereas the Kantian module will also rely on the agent’s goals and how the action’s consequences affect each moral patient.
 
-Finally, in the **explanation stage** the ethics engine has completed the evaluation of the user’s dilemma and the LLM component ****explains it. The system exposes the moral reasons that contribute to each principle’s evaluation results, compares these evaluations, and provides a high-level overview of the ethical theories that underpin the implemented moral principles. The user is then free to continue conversing with **THUFIR**, in order to better understand **THUFIR**’s evaluations or explanations. 
+Finally, in the **explanation stage** the ethics engine has completed the evaluation of the user’s dilemma and the LLM component ****explains it. The system exposes the moral reasons that contribute to each principle’s evaluation results, compares these evaluations, and provides a high-level overview of the ethical theories that underpin the implemented moral principles. The user is then free to continue conversing with **THUFIR**, in order to better understand **THUFIR**’s evaluations or explanations.
 
 **THUFIR’**s goal is to provide clarity and new perspectives rather than concrete guidance. Users may find the system’s questions, evaluations and explanations useful for guiding their own thoughts, but the choice always remains up to humans, as does the responsibility for it.
 """

@@ -1,0 +1,20 @@
+# Define which rules to enable
+output-format = "concise"
+
+# Exclude specific files or directories (e.g., migrations or test data)
+exclude = [
+    ".git",
+    ".venv",
+]
+
+[lint]
+# select = ["B", "C4", "E", "ERA", "F", "FURB", "I", "PERF", "PTH", "RUF", "SIM", "T", "W"]
+ignore = ["RUF012"]
+
+
+# Add per-file specific configurations
+[lint.per-file-ignores]
+# Ignore docstring checks in tests
+"tests/**/*.py" = ["D"]
+# Ignore all linter checks for certain scripts
+"scripts/*.py" = ["ALL"]

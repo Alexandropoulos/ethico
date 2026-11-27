@@ -47,7 +47,7 @@ load_dotenv()
 
 class State(rx.State):
     question: str = ""
-    chat_history: list[tuple[str, str]] = []  
+    chat_history: list[tuple[str, str]] = []
     processing: bool = False
     error: str = ""
     dilemma_json: str = ""
@@ -55,7 +55,7 @@ class State(rx.State):
     evaluated: bool = False
 
     conversation_id: str = ""
-    conversations: list[dict[str, str]] = []  
+    conversations: list[dict[str, str]] = []
 
     chat_generation: int = 0
 
