@@ -2,14 +2,13 @@
 import json
 import os
 import random
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from uuid import UUID
 
 from dotenv import load_dotenv
 from faker import Faker
 from supabase import create_client
-
 
 # --------------------------------------------------
 # Configuration
@@ -139,7 +138,7 @@ def seed_database():
         SUPABASE_KEY,
     )
 
-    base_time = datetime.now(timezone.utc) - timedelta(
+    base_time = datetime.now(UTC) - timedelta(
         days=30
     )
 

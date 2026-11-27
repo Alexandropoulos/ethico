@@ -1,10 +1,10 @@
-from deepeval.test_case import SingleTurnParams
 from deepeval.metrics import (
-    GEval, 
-    TurnRelevancyMetric, 
+    GEval,
     KnowledgeRetentionMetric,
+    TurnRelevancyMetric,
 )
 from deepeval.models import AnthropicModel
+from deepeval.test_case import SingleTurnParams
 
 model = AnthropicModel(
     model="claude-sonnet-4-6",

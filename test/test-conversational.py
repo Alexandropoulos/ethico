@@ -1,7 +1,8 @@
 from pathlib import Path
+
+from metrics import knowledge_retention_metric, relevance_metric
 from test_helpers import load_conversational_test_cases, run_evaluation
-from metrics import relevance_metric, knowledge_retention_metric
- 
+
 PATTERN = str(Path(__file__).parent.parent / "experiments" / "*" / "extraction.txt")
 print(f"Loading test cases from pattern: {PATTERN}")
 METRICS = [relevance_metric, knowledge_retention_metric]

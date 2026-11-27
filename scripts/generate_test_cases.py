@@ -1,4 +1,3 @@
-import json
 import shutil
 import sys
 from pathlib import Path
@@ -52,7 +51,7 @@ def generate_test_cases():
             succeeded += 1
             print(f"[OK] {case_file.stem}")
 
-        except Exception as exc:
+        except (OSError, ValueError, KeyError, RuntimeError) as exc:
             # Avoid retaining an evaluation from a previous run.
             evaluation_path.unlink(missing_ok=True)
 

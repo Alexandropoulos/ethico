@@ -12,9 +12,8 @@ exclude = [
 ignore = ["RUF012"]
 
 
-# Add per-file specific configurations
 [lint.per-file-ignores]
 # Ignore docstring checks in tests
 "tests/**/*.py" = ["D"]
 # Ignore all linter checks for certain scripts
-"scripts/*.py" = ["ALL"]
+"ethics_engine/*.py" = ["ALL"]
