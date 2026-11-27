@@ -1,5 +1,5 @@
 # Define which rules to enable
-output-format = "concise"
+# output-format = "concise"
 
 # Exclude specific files or directories (e.g., migrations or test data)
 exclude = [

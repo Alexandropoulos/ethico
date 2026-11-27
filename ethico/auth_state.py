@@ -148,6 +148,7 @@ class AuthState(rx.State):
             )
 
         except Exception:
+            logger.exception("Registration failed")
             self.auth_error = "Registration failed."
 
         finally:
@@ -181,6 +182,7 @@ class AuthState(rx.State):
             return rx.redirect("/")
 
         except Exception:
+            logger.exception("Login failed")
             self.auth_error = "Invalid credentials or login failed."
 
         finally:
