@@ -45,12 +45,7 @@ class KantianModel(BaseModel):
         consequences_negations = {
             f"Not('{consequence}')" for consequence in consequences
         }
-        (
-            set(actions)
-            | set(consequences)
-            | actions_negations
-            | consequences_negations
-        )
+        (set(actions) | set(consequences) | actions_negations | consequences_negations)
 
         for consequence in mechanisms:
             if consequence not in consequences and not (

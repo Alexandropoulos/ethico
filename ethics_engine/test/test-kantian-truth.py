@@ -22,15 +22,17 @@ GROUND_TRUTH = {
     "terror_bomber.json": False,
     "suffering.json": True,
     "sadism.json": False,
-    "drugs.json": False
+    "drugs.json": False,
 }
 
 
-folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "cases")
+folder_path = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "cases"
+)
 
 
 def evaluate(situation_path):
-    with open(situation_path, 'r') as f:
+    with open(situation_path, "r") as f:
         model = json.load(f)
 
     action = [a for a in model["actions"] if a != "refrain"][0]
@@ -48,11 +50,11 @@ def evaluate(situation_path):
 @pytest.mark.parametrize("filename, expected", GROUND_TRUTH.items())
 def test_kantian_verdict(filename, expected):
     """
-    Tests only the files defined in GROUND_TRUTH. 
+    Tests only the files defined in GROUND_TRUTH.
     Constructs the path using basic string concatenation.
     """
     path = os.path.join(folder_path, filename)
-    
+
     if not os.path.exists(path):
         pytest.fail(f"Dilemma file missing: {path}")
 

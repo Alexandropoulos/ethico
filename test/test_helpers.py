@@ -49,9 +49,7 @@ def run_evaluation(test_cases, metrics, output_path):
 
     for test_case in test_cases:
         name, case_obj = (
-            test_case
-            if isinstance(test_case, tuple)
-            else (test_case.name, test_case)
+            test_case if isinstance(test_case, tuple) else (test_case.name, test_case)
         )
 
         print(f"\n{name}")
@@ -107,18 +105,14 @@ def create_conversational_test_case(
 
         if clean_line.lower().startswith("user:"):
             if current_role and current_content:
-                turns.append(
-                    Turn(role=current_role, content=current_content.strip())
-                )
+                turns.append(Turn(role=current_role, content=current_content.strip()))
 
             current_role = "user"
             current_content = clean_line[5:].strip() + "\n"
 
         elif clean_line.lower().startswith("assistant:"):
             if current_role and current_content:
-                turns.append(
-                    Turn(role=current_role, content=current_content.strip())
-                )
+                turns.append(Turn(role=current_role, content=current_content.strip()))
 
             current_role = "assistant"
             current_content = clean_line[10:].strip() + "\n"
@@ -127,9 +121,7 @@ def create_conversational_test_case(
             current_content += clean_line + "\n"
 
     if current_role and current_content:
-        turns.append(
-            Turn(role=current_role, content=current_content.strip())
-        )
+        turns.append(Turn(role=current_role, content=current_content.strip()))
 
     return (
         os.path.basename(os.path.dirname(file_path)),

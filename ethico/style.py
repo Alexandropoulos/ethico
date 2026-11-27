@@ -61,14 +61,32 @@ sidebar_container = {
     "border_right": f"1px solid {BORDER}",
 }
 sidebar_brand_row = {
-    "align": "center", "justify": "start", "padding_x": "0.65rem", "width": "100%", "spacing": "3"
+    "align": "center",
+    "justify": "start",
+    "padding_x": "0.65rem",
+    "width": "100%",
+    "spacing": "3",
 }
-sidebar_heading = {"as_": "h2", "size": "5", "weight": "bold", "letter_spacing": "-0.025em"}
+sidebar_heading = {
+    "as_": "h2",
+    "size": "5",
+    "weight": "bold",
+    "letter_spacing": "-0.025em",
+}
 sidebar_subheading = {
-    "as_": "h3", "size": "2", "weight": "medium", "color": MUTED, "letter_spacing": "-0.025em"
+    "as_": "h3",
+    "size": "2",
+    "weight": "medium",
+    "color": MUTED,
+    "letter_spacing": "-0.025em",
 }
 sidebar_navigation = {"spacing": "1", "width": "100%"}
-sidebar_link_style = {"underline": "none", "weight": "medium", "width": "100%", "color": TEXT}
+sidebar_link_style = {
+    "underline": "none",
+    "weight": "medium",
+    "width": "100%",
+    "color": TEXT,
+}
 sidebar_link_row = {
     "width": "100%",
     "padding_x": "0.75rem",
@@ -80,20 +98,37 @@ sidebar_link_row = {
 }
 sidebar_link_text = {"size": "3"}
 sidebar_conversations_section = {
-    "width": "100%", "flex": "1", "min_height": "0", "spacing": "2", "align": "stretch"
+    "width": "100%",
+    "flex": "1",
+    "min_height": "0",
+    "spacing": "2",
+    "align": "stretch",
 }
 sidebar_conversations_heading = {
-    "size": "2", "weight": "medium", "color": TEXT, "padding_x": "0.75rem"
+    "size": "2",
+    "weight": "medium",
+    "color": TEXT,
+    "padding_x": "0.75rem",
 }
 sidebar_conversations_header = {"width": "100%", "align": "center"}
 sidebar_new_conversation_button = {
-    "variant": "ghost", "color_scheme": "gray", "size": "1", "padding": "0.4rem"
+    "variant": "ghost",
+    "color_scheme": "gray",
+    "size": "1",
+    "padding": "0.4rem",
 }
 sidebar_conversations_scroll = {
-    "width": "100%", "flex": "1", "min_height": "0", "overflow_y": "auto", "overflow_x": "hidden"
+    "width": "100%",
+    "flex": "1",
+    "min_height": "0",
+    "overflow_y": "auto",
+    "overflow_x": "hidden",
 }
 sidebar_conversations_list = {
-    "width": "100%", "max_width": "100%", "spacing": "1", "align": "stretch"
+    "width": "100%",
+    "max_width": "100%",
+    "spacing": "1",
+    "align": "stretch",
 }
 sidebar_conversation_item = {
     "variant": "ghost",
@@ -145,19 +180,33 @@ sidebar_conversation_title_viewport = {
 sidebar_conversations_empty = {"size": "2", "color": MUTED, "padding": "0.75rem"}
 sidebar_footer = {"width": "100%", "spacing": "4"}
 sidebar_logout = {
-    "variant": "ghost", "color_scheme": "gray", "width": "100%", "justify": "start"
+    "variant": "ghost",
+    "color_scheme": "gray",
+    "width": "100%",
+    "justify": "start",
 }
 sidebar_account_row = {
-    "padding_x": "0.5rem", "align": "center", "justify": "start", "width": "100%"
+    "padding_x": "0.5rem",
+    "align": "center",
+    "justify": "start",
+    "width": "100%",
 }
 sidebar_account_info = {"spacing": "0", "align": "start", "width": "100%"}
 sidebar_account_title = {"size": "3", "weight": "bold"}
 sidebar_account_email = {
-    "size": "2", "weight": "medium", "color": MUTED, "overflow_wrap": "anywhere"
+    "size": "2",
+    "weight": "medium",
+    "color": MUTED,
+    "overflow_wrap": "anywhere",
 }
 
 # Borderless conversation canvas. Only user messages get a quiet bubble.
-message_stack = {"width": "100%", "spacing": "4", "align": "stretch", "margin_y": "0.65rem"}
+message_stack = {
+    "width": "100%",
+    "spacing": "4",
+    "align": "stretch",
+    "margin_y": "0.65rem",
+}
 message_base = {
     "padding": "0.85rem 1.1rem",
     "border_radius": RADIUS_MESSAGE,
@@ -167,7 +216,10 @@ message_base = {
 }
 question_style = message_base | {"bg": SURFACE, "align_self": "end"}
 answer_style = message_base | {
-    "bg": "transparent", "align_self": "start", "padding_x": "0.25rem", "max_width": "100%"
+    "bg": "transparent",
+    "align_self": "start",
+    "padding_x": "0.25rem",
+    "max_width": "100%",
 }
 intro_message = {
     "padding": "1.2rem 0.25rem",
@@ -178,15 +230,25 @@ intro_message = {
     "line_height": "1.7",
 }
 chat_panel = {
-    "width": "100%", "flex": "1", "min_height": "0", "bg": "transparent", "overflow": "hidden"
+    "width": "100%",
+    "flex": "1",
+    "min_height": "0",
+    "bg": "transparent",
+    "overflow": "hidden",
 }
 chat_scroll = {
-    "width": "100%", "height": "100%", "min_height": "0", "padding": "1.2rem 0.65rem"
+    "width": "100%",
+    "height": "100%",
+    "min_height": "0",
+    "padding": "1.2rem 0.65rem",
 }
 
 # A single floating composer, with an icon-only submit action.
 action_bar_container = {
-    "width": "100%", "spacing": "2", "padding_top": "0.65rem", "padding_bottom": "0.4rem"
+    "width": "100%",
+    "spacing": "2",
+    "padding_top": "0.65rem",
+    "padding_bottom": "0.4rem",
 }
 action_bar_row = dict(
     width="100%",
@@ -274,7 +336,10 @@ about_page_content = {
 about_page_center = {"width": "100%", "padding": "2.5rem"}
 about_page_shell = {"width": "100%", "align": "start", "spacing": "0"}
 about_card = {
-    "width": "100%", "max_width": CONTENT_MAX_WIDTH, "padding": "1.5rem", "bg": "transparent"
+    "width": "100%",
+    "max_width": CONTENT_MAX_WIDTH,
+    "padding": "1.5rem",
+    "bg": "transparent",
 }
 about_stack = {"spacing": "5", "align": "stretch", "width": "100%"}
 about_heading = {"size": "8", "weight": "bold"}
@@ -358,7 +423,10 @@ dilemma_detail_body = {
     "padding_bottom": "3rem",
 }
 dilemma_detail_header = {
-    "width": "100%", "align": "start", "justify": "between", "spacing": "3"
+    "width": "100%",
+    "align": "start",
+    "justify": "between",
+    "spacing": "3",
 }
 dilemma_title = {"size": "7", "weight": "bold", "overflow_wrap": "anywhere"}
 dilemma_open_button = {"variant": "outline", "color_scheme": "gray", "flex_shrink": "0"}
@@ -371,7 +439,10 @@ dilemma_section = {
 }
 dilemma_section_heading = {"size": "4", "weight": "bold"}
 dilemma_description = {
-    "size": "3", "line_height": "1.75", "color": TEXT, "overflow_wrap": "anywhere"
+    "size": "3",
+    "line_height": "1.75",
+    "color": TEXT,
+    "overflow_wrap": "anywhere",
 }
 dilemma_field = {"spacing": "2", "align": "stretch", "width": "100%"}
 dilemma_field_label = {"size": "2", "weight": "medium", "color": MUTED}

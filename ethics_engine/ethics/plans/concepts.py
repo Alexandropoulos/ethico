@@ -1,12 +1,13 @@
 import itertools
 import copy
 
+
 class Plan:
     """Representation of an action plan"""
-    
+
     def __init__(self, endoPlan):
         """Constructor of an action plan
-        
+
         :param endoPlan: List of (endogeneous) actions
         :type endoPlan: list
         """
@@ -16,18 +17,32 @@ class Plan:
         p = copy.deepcopy(self)
         for i in range(len(positions)):
             if positions[i] and not cause[i]:
-                new_action = Action(p.endoActions[i].name, dict(), [{"condition": dict(), "effect": p.endoActions[i].last_actual_effects}], p.endoActions[i].intrinsicvalue)
+                new_action = Action(
+                    p.endoActions[i].name,
+                    dict(),
+                    [
+                        {
+                            "condition": dict(),
+                            "effect": p.endoActions[i].last_actual_effects,
+                        }
+                    ],
+                    p.endoActions[i].intrinsicvalue,
+                )
                 p.endoActions[i] = new_action
         return p
 
     def compute_all_fixed_effect_alternatives(self, cause):
-        for b in sorted(itertools.product([1, 0], repeat=len(self.endoActions)), key=sum, reverse=True):
+        for b in sorted(
+            itertools.product([1, 0], repeat=len(self.endoActions)),
+            key=sum,
+            reverse=True,
+        ):
             if sum(b) > 0:
                 yield self.substitute_fixed_effects(cause, b)
 
     def substitute_empty_actions(self, positions):
         """Substitute actions in the plan by the empty action at the given positions.
-        
+
         :param positions: The positions as bit arry, 1-bit = substitute, 0-bit = original action
         :type positions: tuple
         :return: New plan with substitutions
@@ -41,18 +56,22 @@ class Plan:
 
     def compute_all_epsilon_alternatives(self):
         """Retrieves all alternatives to the plan where each alternative is another way to substitute some actions
-            by the empty action epsilon.
+        by the empty action epsilon.
 
-            :return: Iterator over epsilon alternative
-            :rtype: Iterator
+        :return: Iterator over epsilon alternative
+        :rtype: Iterator
         """
-        for b in sorted(itertools.product([1, 0], repeat=len(self.endoActions)), key=sum, reverse=True):
+        for b in sorted(
+            itertools.product([1, 0], repeat=len(self.endoActions)),
+            key=sum,
+            reverse=True,
+        ):
             if sum(b) > 0:
                 yield self.substitute_empty_actions(b)
 
     def delete_effect_from_actions(self, effect, positions):
         """Deletes the given effect from all actions where the corresponding bit in list positions is 1.
-        
+
         :param effect: The effect to be deleted
         :type effect: dict
         :param positions: Positions at which to delete the effect
@@ -68,7 +87,7 @@ class Plan:
 
     def __all_manipulated_actions_have_effect_somewhere(self, effect, positions):
         """Checks if all actions considered for effect deletion indeed have the effect
-        
+
         :param effect: The effect
         :type effect: dict
         :param positions: Bit tuple indicating the actions to consider
@@ -83,41 +102,48 @@ class Plan:
 
     def compute_all_effect_alternatives(self, effect):
         """Computes all plans where the effect is deleted from some actions
-        
+
         :param effect: The effect to be deleted
         :type effect: dict
         :return: Iterator over alternatives
         :rtype: Iterator
         """
-        for b in sorted(itertools.product([1, 0], repeat=len(self.endoActions)), key=sum, reverse=True):
-            if sum(b) > 0 and self.__all_manipulated_actions_have_effect_somewhere(effect, b):
+        for b in sorted(
+            itertools.product([1, 0], repeat=len(self.endoActions)),
+            key=sum,
+            reverse=True,
+        ):
+            if sum(b) > 0 and self.__all_manipulated_actions_have_effect_somewhere(
+                effect, b
+            ):
                 yield self.delete_effect_from_actions(effect, b)
 
     def __str__(self):
         """String representation of an action plan
-        
+
         :return: String representation
         :rtype: str
         """
         s = "["
         for a in self.endoActions:
             s += str(a) + ","
-        return s+"]"
+        return s + "]"
 
     def __repr__(self):
         """Representation of an action object
-        
+
         :return: String representation
         :rtype: str
         """
         return self.__str__()
+
 
 class Action:
     """Representation of an endogeneous action"""
 
     def __init__(self, name, pre, eff, intrinsicvalue):
         """Constructor of an action.
-        
+
         :param name: Label of the action
         :type name: str
         :param pre: Preconditions of the action
@@ -133,10 +159,10 @@ class Action:
         self.intrinsicvalue = intrinsicvalue
 
         self.last_actual_effects = dict()
-        
+
     def __str__(self):
         """String representation of an action
-        
+
         :return: String representation
         :rtype: str
         """
@@ -147,7 +173,7 @@ class Action:
 
     def has_effect_somewhere(self, effect):
         """Checks if a given effect is potentially an effect of the action.
-        
+
         :param effect: The effect.
         :type effect: dict
         :return: True or False
@@ -165,7 +191,7 @@ class Action:
 
     def delete_effect(self, effect):
         """Delete an effect from all effects.
-        
+
         :param effect: The effect to be deleted.
         :type effect: dict
         :return: New action with deleted effect
@@ -181,21 +207,25 @@ class Action:
     def clone_action(self):
         return copy.deepcopy(self)
 
+
 class EmptyAction(Action):
     """Empty Action"""
 
     def __init__(self):
-        super().__init__("epsilon", dict(), [{"condition": dict(), "effect": dict()}], "neutral")
-    
+        super().__init__(
+            "epsilon", dict(), [{"condition": dict(), "effect": dict()}], "neutral"
+        )
+
     def has_effect_somewhere(self, effect):
         return False
 
+
 class Event:
     """Representation of an event"""
-    
+
     def __init__(self, name, pre, eff, time):
         """Constructor of an event
-        
+
         :param name: Label of the event
         :type name: str
         :param pre: Preconditions of the event
@@ -212,7 +242,7 @@ class Event:
 
     def __str__(self):
         """String representation of an event
-        
+
         :return: String representation
         :rtype: str
         """

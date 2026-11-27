@@ -18,9 +18,7 @@ from ethico.evaluator import evaluate_dilemma
 
 def generate_test_cases():
     if not CASES_DIR.is_dir():
-        raise FileNotFoundError(
-            f"Cases directory not found: {CASES_DIR}"
-        )
+        raise FileNotFoundError(f"Cases directory not found: {CASES_DIR}")
 
     case_files = sorted(CASES_DIR.glob("*.json"))
 

@@ -32,4 +32,3 @@ def evaluate_dilemma(situation_path: str, evaluation_path: str):
 
     with open(evaluation_path, "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2, default=str)
-
