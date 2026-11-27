@@ -20,8 +20,7 @@ def test_theory_verdicts(
     actual_utilitarian = get_verdict(result, "utilitarian")
 
     assert actual_kantian is expected_kantian, (
-        f"{dilemma_name} (Kantian): "
-        f"expected {expected_kantian}, got {actual_kantian}"
+        f"{dilemma_name} (Kantian): expected {expected_kantian}, got {actual_kantian}"
     )
 
     assert actual_utilitarian is expected_utilitarian, (

@@ -8,7 +8,9 @@ from test._helpers import run_evaluation
 
 def main():
     parser = argparse.ArgumentParser(description="Evaluate a reference dilemma.")
-    parser.add_argument("dilemma_name", help="Case directory name, e.g. trolley_problem")
+    parser.add_argument(
+        "dilemma_name", help="Case directory name, e.g. trolley_problem"
+    )
     args = parser.parse_args()
 
     with TemporaryDirectory() as directory:

@@ -39,13 +39,10 @@ class KantianModel(BaseModel):
     def validate_mechanisms(
         cls, mechanisms: dict[str, str], info: ValidationInfo
     ) -> dict[str, str]:
-        actions = info.data["actions"]
+        if "consequences" not in info.data:
+            return mechanisms
+
         consequences = info.data["consequences"]
-        actions_negations = {f"Not('{action}')" for action in actions}
-        consequences_negations = {
-            f"Not('{consequence}')" for consequence in consequences
-        }
-        (set(actions) | set(consequences) | actions_negations | consequences_negations)
 
         for consequence in mechanisms:
             if consequence not in consequences and not (
@@ -75,6 +72,9 @@ class KantianModel(BaseModel):
     def validate_affects(
         cls, affects: dict[str, list[list[str]]], info: ValidationInfo
     ) -> dict[str, list[list[str]]]:
+        if not {"patients", "actions", "consequences"}.issubset(info.data):
+            return affects
+
         patients = info.data["patients"]
         actions = info.data["actions"]
         consequences = info.data["consequences"]
@@ -136,7 +136,9 @@ class UtilitarianModel(BaseModel):
     def validate_mechanisms(
         cls, mechanisms: dict[str, str], info: ValidationInfo
     ) -> dict[str, str]:
-        info.data["actions"]
+        if "consequences" not in info.data:
+            return mechanisms
+
         consequences = info.data["consequences"]
 
         for key in mechanisms:
@@ -159,6 +161,9 @@ class UtilitarianModel(BaseModel):
     def validate_utilities(
         cls, utilities: dict[str, int], info: ValidationInfo
     ) -> dict[str, int]:
+        if "consequences" not in info.data:
+            return utilities
+
         consequences = info.data["consequences"]
         negations = {f"Not('{consequence}')" for consequence in consequences}
 
@@ -196,6 +201,9 @@ class UnifiedModel(KantianModel):
     def validate_utilities(
         cls, utilities: dict[str, int], info: ValidationInfo
     ) -> dict[str, int]:
+        if "consequences" not in info.data:
+            return utilities
+
         consequences = info.data["consequences"]
         negations = {f"Not('{consequence}')" for consequence in consequences}
 

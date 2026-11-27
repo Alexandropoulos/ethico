@@ -1,0 +1,34 @@
+{
+  "description": "A person can help a patient recover or refrain from helping.",
+  "actions": [
+    "help",
+    "refrain"
+  ],
+  "consequences": [
+    "recovery"
+  ],
+  "mechanisms": {
+    "recovery": "'help'"
+  },
+  "utilities": {
+    "recovery": 10,
+    "unknown": 5
+  },
+  "goals": {
+    "help": [
+      "recovery"
+    ],
+    "refrain": []
+  },
+  "patients": [
+    "patient"
+  ],
+  "affects": {
+    "recovery": [
+      [
+        "patient",
+        "+"
+      ]
+    ]
+  }
+}
