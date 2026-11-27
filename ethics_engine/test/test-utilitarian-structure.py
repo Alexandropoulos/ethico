@@ -3,8 +3,10 @@ import os
 import pytest
 from ethico.validator import UtilitarianModel
 
-folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
-                           "cases", "cam")
+folder_path = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "cases", "cam"
+)
+
 
 def get_dilemma_files():
     """
@@ -17,12 +19,13 @@ def get_dilemma_files():
                 files.append(os.path.join(folder_path, filename))
     return files
 
+
 @pytest.mark.parametrize("file_path", get_dilemma_files())
 def test_utilitarian_model_validation(file_path):
     """
     Test case that iterates through each file found in folder_path.
     The filename is used in the test ID for better reporting.
     """
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         model_data = json.load(f)
     UtilitarianModel.model_validate(model_data)

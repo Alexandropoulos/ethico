@@ -1,6 +1,8 @@
 import reflex as rx
-from ..auth_state import AuthState
+
 from ethico import style
+
+from ..auth_state import AuthState
 
 
 def login():

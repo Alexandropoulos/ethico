@@ -1,5 +1,6 @@
 import json
 import logging
+
 import reflex as rx
 
 from .database import create_supabase_client
@@ -143,10 +144,11 @@ class AuthState(rx.State):
                 return rx.redirect("/")
 
             self.auth_error = (
-                "Registration submitted. " "Check your email to confirm your account."
+                "Registration submitted. Check your email to confirm your account."
             )
 
         except Exception:
+            logger.exception("Registration failed")
             self.auth_error = "Registration failed."
 
         finally:
@@ -180,6 +182,7 @@ class AuthState(rx.State):
             return rx.redirect("/")
 
         except Exception:
+            logger.exception("Login failed")
             self.auth_error = "Invalid credentials or login failed."
 
         finally:

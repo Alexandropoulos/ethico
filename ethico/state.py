@@ -15,7 +15,6 @@ from ethico.constants import (
     OPENAI_TOOLS,
     SYSTEM_PROMPT,
     TITLE_GENERATION_PROMPT,
-    TROLLEY_TEST_PROMPT,
 )
 from ethico.conversation_service import (
     AlreadyEvaluatedError,
@@ -58,8 +57,6 @@ class State(rx.State):
     conversation_id: str = ""
     conversations: list[dict[str, str]] = []
 
-    # Incremented whenever chats or users change so an old stream cannot
-    # write into a different conversation.
     chat_generation: int = 0
 
     @rx.event
@@ -116,12 +113,14 @@ class State(rx.State):
             )
             # The saved dilemma belongs to the conversation, not its messages.
             record = await asyncio.to_thread(
-                lambda: client.table("conversations")
-                .select("dilemma,evaluation")
-                .eq("id", conversation_id)
-                .eq("user_id", user_id)
-                .single()
-                .execute()
+                lambda: (
+                    client.table("conversations")
+                    .select("dilemma,evaluation")
+                    .eq("id", conversation_id)
+                    .eq("user_id", user_id)
+                    .single()
+                    .execute()
+                )
             )
             if self.chat_generation != generation:
                 return
@@ -309,8 +308,10 @@ class State(rx.State):
                     situation_path = await self._extract_dilemma(openai, messages)
                     evaluation_path = Path(situation_path).parent / "evaluation.json"
 
-                    with open(situation_path, encoding="utf-8") as f:
-                        situation = json.load(f)
+                    situation_json = await asyncio.to_thread(
+                        Path(situation_path).read_text, encoding="utf-8"
+                    )
+                    situation = json.loads(situation_json)
 
                     await asyncio.to_thread(
                         save_situation, supabase, conversation_id, situation
@@ -321,8 +322,11 @@ class State(rx.State):
                         situation_path,
                         str(evaluation_path),
                     )
-                    with open(evaluation_path, encoding="utf-8") as f:
-                        evaluation = json.load(f)
+                    evaluation = json.loads(
+                        await asyncio.to_thread(
+                            evaluation_path.read_text, encoding="utf-8"
+                        )
+                    )
 
                     await asyncio.to_thread(
                         save_evaluation, supabase, conversation_id, evaluation
@@ -331,9 +335,7 @@ class State(rx.State):
                     async with self:
                         if self.chat_generation != generation:
                             return
-                        self.dilemma_json = Path(situation_path).read_text(
-                            encoding="utf-8"
-                        )
+                        self.dilemma_json = situation_json
                         self.dilemma_panel_open = True
                         self.evaluated = True
                     messages.append(
@@ -577,7 +579,11 @@ class State(rx.State):
         extracted_model = json.loads(tool_calls[0].function.arguments)
         UnifiedModel.model_validate(extracted_model)
 
-        situation_path = Path(tempfile.mkdtemp(prefix="thufir_")) / "situation.json"
-        with open(situation_path, "w", encoding="utf-8") as f:
-            json.dump(extracted_model, f, indent=2)
+        directory = await asyncio.to_thread(tempfile.mkdtemp, prefix="thufir_")
+        situation_path = Path(directory) / "situation.json"
+        await asyncio.to_thread(
+            situation_path.write_text,
+            json.dumps(extracted_model, indent=2),
+            encoding="utf-8",
+        )
         return str(situation_path)

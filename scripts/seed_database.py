@@ -1,15 +1,13 @@
-
 import json
 import os
 import random
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from uuid import UUID
 
 from dotenv import load_dotenv
 from faker import Faker
 from supabase import create_client
-
 
 # --------------------------------------------------
 # Configuration
@@ -41,6 +39,7 @@ fake.seed_instance(SEED)
 # Helpers
 # --------------------------------------------------
 
+
 def load_json(path: Path):
     with path.open("r", encoding="utf-8") as file:
         return json.load(file)
@@ -50,9 +49,7 @@ def get_test_cases():
     """Load distinct, successfully evaluated test cases."""
 
     if not TEST_CASES_DIR.is_dir():
-        raise FileNotFoundError(
-            f"Directory not found: {TEST_CASES_DIR}"
-        )
+        raise FileNotFoundError(f"Directory not found: {TEST_CASES_DIR}")
 
     cases = []
 
@@ -64,20 +61,19 @@ def get_test_cases():
         evaluation_path = directory / "evaluation.json"
 
         # Only use complete test cases.
-        if not (
-            situation_path.is_file()
-            and evaluation_path.is_file()
-        ):
+        if not (situation_path.is_file() and evaluation_path.is_file()):
             continue
 
         situation = load_json(situation_path)
         evaluation = load_json(evaluation_path)
 
-        cases.append({
-            "name": directory.name,
-            "situation": situation,
-            "evaluation": evaluation,
-        })
+        cases.append(
+            {
+                "name": directory.name,
+                "situation": situation,
+                "evaluation": evaluation,
+            }
+        )
 
     if len(cases) < CONVERSATION_COUNT:
         raise ValueError(
@@ -97,20 +93,18 @@ def generate_messages(conversation_id, created_at, count):
         role = "user" if index % 2 == 0 else "assistant"
 
         # Faker generates fictional placeholder content.
-        content = fake.paragraph(
-            nb_sentences=rng.randint(2, 5)
-        )
+        content = fake.paragraph(nb_sentences=rng.randint(2, 5))
 
-        timestamp = created_at + timedelta(
-            minutes=(index + 1) * rng.randint(1, 3)
-        )
+        timestamp = created_at + timedelta(minutes=(index + 1) * rng.randint(1, 3))
 
-        messages.append({
-            "conversation_id": conversation_id,
-            "role": role,
-            "content": content,
-            "created_at": timestamp.isoformat(),
-        })
+        messages.append(
+            {
+                "conversation_id": conversation_id,
+                "role": role,
+                "content": content,
+                "created_at": timestamp.isoformat(),
+            }
+        )
 
     return messages
 
@@ -119,12 +113,10 @@ def generate_messages(conversation_id, created_at, count):
 # Seeding
 # --------------------------------------------------
 
+
 def seed_database():
     if len(USER_IDS) != 3:
-        raise ValueError(
-            "Exactly 3 user UUIDs are required in "
-            "SUPABASE_TEST_USER_IDS."
-        )
+        raise ValueError("Exactly 3 user UUIDs are required in SUPABASE_TEST_USER_IDS.")
 
     for user_id in USER_IDS:
         UUID(user_id)
@@ -139,9 +131,7 @@ def seed_database():
         SUPABASE_KEY,
     )
 
-    base_time = datetime.now(timezone.utc) - timedelta(
-        days=30
-    )
+    base_time = datetime.now(UTC) - timedelta(days=30)
 
     total_messages = 0
 
@@ -166,11 +156,7 @@ def seed_database():
             "created_at": created_at.isoformat(),
         }
 
-        result = (
-            supabase.table("conversations")
-            .insert(conversation)
-            .execute()
-        )
+        result = supabase.table("conversations").insert(conversation).execute()
 
         conversation_id = result.data[0]["id"]
 
@@ -180,11 +166,7 @@ def seed_database():
             message_count,
         )
 
-        (
-            supabase.table("messages")
-            .insert(messages)
-            .execute()
-        )
+        (supabase.table("messages").insert(messages).execute())
 
         total_messages += len(messages)
 

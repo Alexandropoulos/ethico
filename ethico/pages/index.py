@@ -1,6 +1,34 @@
 import reflex as rx
-from ethico.components import chat_page
+
+from ethico import style
+from ethico.components import action_bar, chat, sidebar
+from ethico.state import State
 
 
 def index() -> rx.Component:
-    return chat_page()
+    return rx.hstack(
+        sidebar(),
+        rx.center(
+            rx.vstack(
+                chat(),
+                action_bar(),
+                rx.cond(
+                    State.error != "",
+                    rx.text(State.error, role="alert", **style.error_text),
+                ),
+                **style.chat_column,
+            ),
+            **style.page_content,
+        ),
+        rx.cond(
+            (State.dilemma_json != "") & ~State.dilemma_panel_open,
+            rx.button(
+                rx.icon("panel-right-open", size=17),
+                "Show dilemma model",
+                on_click=State.toggle_dilemma_panel,
+                aria_label="Show dilemma model",
+                **style.dilemma_panel_toggle,
+            ),
+        ),
+        **style.page_shell,
+    )

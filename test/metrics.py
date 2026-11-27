@@ -1,15 +1,12 @@
-from deepeval.test_case import SingleTurnParams
 from deepeval.metrics import (
-    GEval, 
-    TurnRelevancyMetric, 
+    GEval,
     KnowledgeRetentionMetric,
+    TurnRelevancyMetric,
 )
 from deepeval.models import AnthropicModel
+from deepeval.test_case import SingleTurnParams
 
-model = AnthropicModel(
-    model="claude-sonnet-4-6",
-    temperature=0.0
-)
+model = AnthropicModel(model="claude-sonnet-4-6", temperature=0.0)
 
 # DeepEval docs suggest 2-3 standard conversational metrics and 1-2 custom metrics per evaluation.
 # Threshold values are subject to change.
@@ -37,7 +34,7 @@ faithfulness_metric = GEval(
     """,
     evaluation_params=[SingleTurnParams.INPUT, SingleTurnParams.ACTUAL_OUTPUT],
     model=model,
-    threshold=0.7
+    threshold=0.7,
 )
 
 semantic_capture_metric = GEval(
@@ -66,7 +63,7 @@ semantic_capture_metric = GEval(
         """,
     evaluation_params=[SingleTurnParams.INPUT, SingleTurnParams.ACTUAL_OUTPUT],
     model=model,
-    threshold=0.7
+    threshold=0.7,
 )
 
 # Explanation Metrics
@@ -106,7 +103,7 @@ explanation_structure_metric = GEval(
     """,
     evaluation_params=[SingleTurnParams.INPUT, SingleTurnParams.ACTUAL_OUTPUT],
     model=model,
-    threshold=0.7
+    threshold=0.7,
 )
 
 explanatory_value_metric = GEval(
@@ -132,5 +129,5 @@ explanatory_value_metric = GEval(
     """,
     evaluation_params=[SingleTurnParams.INPUT, SingleTurnParams.ACTUAL_OUTPUT],
     model=model,
-    threshold=0.7
+    threshold=0.7,
 )

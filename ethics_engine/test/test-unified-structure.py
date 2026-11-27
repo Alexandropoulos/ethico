@@ -8,6 +8,7 @@ folder_path = os.path.join(
     "cases",
 )
 
+
 def get_dilemma_files():
     """
     Helper function to gather all JSON files from the folder_path.

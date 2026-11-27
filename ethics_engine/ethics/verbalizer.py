@@ -1,33 +1,35 @@
 from ethics.language import *
 
+
 def reason_to_nl(reason):
     if isinstance(reason, str):
         return reason
     if isinstance(reason, Not):
-        return "it is not the case that "+reason_to_nl(reason.f1)
+        return "it is not the case that " + reason_to_nl(reason.f1)
     if isinstance(reason, Causes):
-        return reason_to_nl(reason.f1)+" directly causes "+ reason_to_nl(reason.f2)
+        return reason_to_nl(reason.f1) + " directly causes " + reason_to_nl(reason.f2)
     if isinstance(reason, And):
-        return reason_to_nl(reason.f1)+" and "+reason_to_nl(reason.f2)
+        return reason_to_nl(reason.f1) + " and " + reason_to_nl(reason.f2)
     if isinstance(reason, Or):
-        return reason_to_nl(reason.f1)+" or "+reason_to_nl(reason.f2)
+        return reason_to_nl(reason.f1) + " or " + reason_to_nl(reason.f2)
     if isinstance(reason, Gt):
         if reason.f1 == 0:
-            return reason_to_nl(reason.f2.t1)+" is bad "
+            return reason_to_nl(reason.f2.t1) + " is bad "
         if reason.f2 == 0:
-            return reason_to_nl(reason.f1.t1)+" is good "
+            return reason_to_nl(reason.f1.t1) + " is good "
+
 
 def verbalize(reason):
     nlp_reason = ""
     for r in reason:
         if len(nlp_reason) > 0:
-            nlp_reason = nlp_reason.strip()+". Moreover, "
-        nlp_reason += reason_to_nl(r).capitalize()           
-    return nlp_reason.strip()+"."
+            nlp_reason = nlp_reason.strip() + ". Moreover, "
+        nlp_reason += reason_to_nl(r).capitalize()
+    return nlp_reason.strip() + "."
 
 
 # Test
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Reason 1
     # Pull directly causes tram_hits_man and tram_hits_man is bad.
     reason1 = [And(Causes("pull", "tram_hits_man"), Gt(0, U("tram_hits_man")))]
@@ -38,7 +40,10 @@ if __name__ == '__main__':
     print(verbalize(reason2))
     # Reason 3
     # It is not the case that refrain directly causes it is not the case that person1_survives. Moreover, It is not the case that refrain directly causes it is not the case that person2_survives.
-    reason3 = [Not(Causes("refrain", Not("person1_survives"))), Not(Causes("refrain", Not("person2_survives")))]
+    reason3 = [
+        Not(Causes("refrain", Not("person1_survives"))),
+        Not(Causes("refrain", Not("person2_survives"))),
+    ]
     print(verbalize(reason3))
     # Reason 4
     # C1. Moreover, C2. Moreover, It is not the case that c3.

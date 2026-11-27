@@ -1,7 +1,7 @@
-import os
 import json
-from ethics.cam.semantics import CausalModel
+
 from ethics.cam.principles import KantianHumanityPrinciple, UtilitarianPrinciple
+from ethics.cam.semantics import CausalModel
 
 
 def evaluate_dilemma(situation_path: str, evaluation_path: str):
@@ -13,7 +13,7 @@ def evaluate_dilemma(situation_path: str, evaluation_path: str):
     with open(situation_path, "r") as f:
         model = json.load(f)
 
-    action = [a for a in model["actions"] if a != "refrain"][0]
+    action = next(a for a in model["actions"] if a != "refrain")
     action_world = {action: 1, "refrain": 0}
     inaction_world = {action: 0, "refrain": 1}
 
@@ -32,5 +32,3 @@ def evaluate_dilemma(situation_path: str, evaluation_path: str):
 
     with open(evaluation_path, "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2, default=str)
-
-    print(f"Evaluation saved to: {evaluation_path}")

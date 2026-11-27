@@ -2,7 +2,8 @@ from ethics.language import Formula, Not
 from ethics.solver import satisfiable, smt_all_models
 from ethics.tools import my_eval
 from ethics.extensions.mhsModule import hitting_sets as mhs_new
-#from ethics.extensions.mhs import mhs as mhs_new
+# from ethics.extensions.mhs import mhs as mhs_new
+
 
 def hitting_sets_gde(sets):
     sets = sorted(sets, key=len)
@@ -22,7 +23,6 @@ def hitting_sets_gde(sets):
     return result
 
 
-
 def remove_trivial_clauses(clauses):
     r = []
     for c in clauses:
@@ -30,12 +30,14 @@ def remove_trivial_clauses(clauses):
             r.append(c)
     return r
 
+
 def remove_unsatisfiable_terms(terms):
     r = []
     for t in terms:
         if satisfiable(Formula.makeConjunction(t)):
             r.append(t)
     return r
+
 
 def compute_primes(formula):
     models = smt_all_models(formula)
@@ -54,7 +56,11 @@ def generate_reasons(model, principle, *args):
         cants, cates = compute_primes(Not(principle.buildConjunction()).nnf())
 
     # Sufficient reasons from prime implicants
-    suff = {Formula.makeConjunction(c) for c in cants if model.models(Formula.makeConjunction(c))}
+    suff = {
+        Formula.makeConjunction(c)
+        for c in cants
+        if model.models(Formula.makeConjunction(c))
+    }
 
     # Necessary reasons from prime implicates
     necc = set()

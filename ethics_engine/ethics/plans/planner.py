@@ -1,19 +1,20 @@
 from ethics.plans.concepts import Plan
 
+
 class Planner:
-    """ A very simplistic planner """
+    """A very simplistic planner"""
 
     def __init__(self, situation):
         """Constructor
-        
+
         :param situation: Description of the situation
         :type situation: Situation
         """
         self.situation = situation
 
-    def generate_plan(self, frontier = None, k = 10, goal_checker = None):
+    def generate_plan(self, frontier=None, k=10, goal_checker=None):
         """A very simple action planner.
-        
+
         :param frontier: The frontier of the current search (default is None)
         :type frontier: list
         :param k: Maximum plan length, for performance reasons (default is 10)
@@ -35,7 +36,7 @@ class Planner:
                 return s
         for i in range(len(frontier)):
             for a in self.situation.actions:
-                newplancand = Plan(frontier[i].endoActions+[a.clone_action()])
+                newplancand = Plan(frontier[i].endoActions + [a.clone_action()])
                 s = goal_checker(newplancand)
                 if s != False:
                     return s
@@ -44,7 +45,7 @@ class Planner:
 
     def plan_found(self, newplancand):
         """Check if a new plan has been found. Used by generatePlan.
-        
+
         :param newplancand: New candidate plan to be checked
         :type newplancand: Plan
         :return: Situation if plan has been found, otherwise False
@@ -57,11 +58,11 @@ class Planner:
             return newsit
         return False
 
-class MoralPlanner(Planner):
 
+class MoralPlanner(Planner):
     def __init__(self, situation, principle):
         """Constructor
-        
+
         :param situation: Description of the situation
         :type situation: Situation
         :param principle: Ethical principle
@@ -70,9 +71,9 @@ class MoralPlanner(Planner):
         super().__init__(situation)
         self.principle = principle
 
-    def generate_plan(self, frontier=None, k=10, goal_checker = None):
+    def generate_plan(self, frontier=None, k=10, goal_checker=None):
         """Generates a new plan.
-        
+
         :param frontier: Current frontiert, defaults to None
         :type frontier: list of Plan, optional
         :param k: Search depth, defaults to 10
@@ -88,7 +89,7 @@ class MoralPlanner(Planner):
 
     def plan_found(self, newplancand):
         """Checks if Situation satisfies the goal
-        
+
         :param newplancand: New plan candidate
         :type newplancand: Plan
         :return: Situation if plan achieves goal, otherwise False
@@ -101,7 +102,7 @@ class MoralPlanner(Planner):
 
     def generate_creative_alternative(self, principle):
         """Generates a permissible alternative to the current situation.
-        
+
         :param principle: Ethical principle the plan of the new situation should satisfy.
         :type principle: Principle
         :return: Situation which the principle permits
@@ -123,9 +124,9 @@ class MoralPlanner(Planner):
            * Case 2: Case 1 does not hold. Therefore, a better plan is
                    searched for.
            * Case 3: Case 1 does not hold and the search in Case 2 is
-                   unsuccessful. A counterfactual alternative situation is 
+                   unsuccessful. A counterfactual alternative situation is
                    constructed which meets the requirements of the ethical principle.
-        
+
         :param principle: The ethical principle to use to judge the situation
         :type principle: Principle
         :return: The solution

@@ -22,7 +22,7 @@ KANTIAN_TRUTH = {
     "terror_bomber.json": False,
     "suffering.json": True,
     "sadism.json": False,
-    "drugs.json": False
+    "drugs.json": False,
 }
 
 UTILITARIAN_TRUTH = {
@@ -43,18 +43,20 @@ UTILITARIAN_TRUTH = {
     "trolley_problem.json": True,
     "suffering.json": False,
     "sadism.json": False,
-    "drugs.json": False
+    "drugs.json": False,
 }
 
-folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                           "cases")
+folder_path = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "cases"
+)
 test_cases = [
     (filename, KANTIAN_TRUTH[filename], UTILITARIAN_TRUTH[filename])
     for filename in KANTIAN_TRUTH.keys()
 ]
 
+
 def evaluate(situation_path):
-    with open(situation_path, 'r') as f:
+    with open(situation_path, "r") as f:
         model = json.load(f)
 
     action = [a for a in model["actions"] if a != "refrain"][0]
@@ -75,20 +77,20 @@ def evaluate(situation_path):
 @pytest.mark.parametrize("filename, expected_kantian, expected_utilitarian", test_cases)
 def test_theory_verdicts(filename, expected_kantian, expected_utilitarian):
     """
-    Tests all files for both Kantian and Utilitarian theories against their ground truths. 
+    Tests all files for both Kantian and Utilitarian theories against their ground truths.
     Constructs the path using basic string concatenation.
     """
     path = os.path.join(folder_path, filename)
-    
+
     if not os.path.exists(path):
         pytest.fail(f"Dilemma file missing: {path}")
 
     actual_kantian, actual_utilitarian = evaluate(path)
-    
+
     assert actual_kantian == expected_kantian, (
         f"{filename} (Kantian): expected permissible={expected_kantian}, got {actual_kantian}"
     )
-    
+
     assert actual_utilitarian == expected_utilitarian, (
         f"{filename} (Utilitarian): expected permissible={expected_utilitarian}, got {actual_utilitarian}"
     )

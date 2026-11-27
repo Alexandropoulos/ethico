@@ -145,11 +145,22 @@ That is, initially, neither Celia not Alice were happy. Bob then gave the flower
 To evaluate Bob’s plan using the ethical principles defined in the HERA framework, we first have to load the described situation. We do that by loading a JSON file that contains the description outlined above. HERA provides a Python interface for doing so.
 ```python
 from ethics.plans.semantics import Situation
+
 sit = Situation("./cases/plans/flowers.yaml")
 ```
 Next, we can check permissibility of the situation according to several principles.
 ```python
-from ethics.plans.principles import KantianHumanity, DoNoHarm, DoNoInstrumentalHarm, Utilitarianism, Deontology, GoalDeontology, DoubleEffectPrinciple, AvoidAnyHarm, AvoidAvoidableHarm
+from ethics.plans.principles import (
+    KantianHumanity,
+    DoNoHarm,
+    DoNoInstrumentalHarm,
+    Utilitarianism,
+    Deontology,
+    GoalDeontology,
+    DoubleEffectPrinciple,
+    AvoidAnyHarm,
+    AvoidAvoidableHarm,
+)
 
 perm = sit.evaluate(Deontology)
 print("Deontology: ", perm)
@@ -202,9 +213,20 @@ The HERA Python software package ethics has recently been updated by a module fo
 Consider the same situation as above but this time we call ```explain``` rather than ```evaluate```:
 ```python
 from ethics.plans.semantics import Situation
+
 sit = Situation("./cases/plans/flowers.yaml")
 
-from ethics.plans.principles import KantianHumanity, DoNoHarm, DoNoInstrumentalHarm, Utilitarianism, Deontology, GoalDeontology, DoubleEffectPrinciple, AvoidAnyHarm, AvoidAvoidableHarm
+from ethics.plans.principles import (
+    KantianHumanity,
+    DoNoHarm,
+    DoNoInstrumentalHarm,
+    Utilitarianism,
+    Deontology,
+    GoalDeontology,
+    DoubleEffectPrinciple,
+    AvoidAnyHarm,
+    AvoidAvoidableHarm,
+)
 
 perm = sit.explain(Deontology)
 print("Deontology: ", perm)
@@ -239,18 +261,45 @@ print("AvoidAnyHarm: ", perm)
 
 The console output of the above script is quite lengthy. Therefore, let us focus on two explantions given by the Goal-focused Deontology and by the Kantian principle.
 ```python
-{'permissible': True, 
- 'principle': 'GoalDeontology',
- 'sufficient': [And(And(And(Not(Bad('happy_celia')), Not(Bad('happy_alice'))), Not(Goal(Not('happy_celia')))), Not(Goal(Not('happy_alice')))), 
-               And(And(And(Not(Goal('happy_celia')), Not(Bad('happy_alice'))), Not(Goal(Not('happy_celia')))), Not(Goal(Not('happy_alice'))))], 
- 'necessary': [Not(Bad('happy_alice')), Not(Goal(Not('happy_alice'))), Not(Goal(Not('happy_celia'))), Or(Not(Bad('happy_celia')), Not(Goal('happy_celia')))],
- 'inus': [Not(Bad('happy_alice')), Not(Goal(Not('happy_alice'))), Not(Goal(Not('happy_celia')))]}
+{
+    "permissible": True,
+    "principle": "GoalDeontology",
+    "sufficient": [
+        And(
+            And(
+                And(Not(Bad("happy_celia")), Not(Bad("happy_alice"))),
+                Not(Goal(Not("happy_celia"))),
+            ),
+            Not(Goal(Not("happy_alice"))),
+        ),
+        And(
+            And(
+                And(Not(Goal("happy_celia")), Not(Bad("happy_alice"))),
+                Not(Goal(Not("happy_celia"))),
+            ),
+            Not(Goal(Not("happy_alice"))),
+        ),
+    ],
+    "necessary": [
+        Not(Bad("happy_alice")),
+        Not(Goal(Not("happy_alice"))),
+        Not(Goal(Not("happy_celia"))),
+        Or(Not(Bad("happy_celia")), Not(Goal("happy_celia"))),
+    ],
+    "inus": [
+        Not(Bad("happy_alice")),
+        Not(Goal(Not("happy_alice"))),
+        Not(Goal(Not("happy_celia"))),
+    ],
+}
 
-{'permissible': False, 
- 'principle': 'KantianHumanity',
- 'sufficient': [And(Means('celia'), Not(End('celia')))],
- 'necessary': [Not(End('celia')), Means('celia')],
- 'inus': [Not(End('celia')), Means('celia')]}
+{
+    "permissible": False,
+    "principle": "KantianHumanity",
+    "sufficient": [And(Means("celia"), Not(End("celia")))],
+    "necessary": [Not(End("celia")), Means("celia")],
+    "inus": [Not(End("celia")), Means("celia")],
+}
 ```
 
 Goal-focused deontology argues that Bob's plan is permissible. It says that for permissibility it was already sufficient that being happy is not bad and that not being happy was not a goal. Moreover, as celia being happy was not a goal, it also does not matter if she being happy is morally bad. Hence, we have two *sufficient reasons*. The *necessary reasons* state conditions whose negation would result in another judgment: If it were bad that alice is happy, then Bob's plan would be impermissible etc. The *INUS reasons* point to *necessary reasons that are part of sufficient reasons* and often are most concise.

@@ -56,7 +56,7 @@ class PrimeCompilator:
         # num_models = self.__number_of_complete_models(self.found_models)
         # if num_models > (possible_assignments / 2):
         #    self.found_models = None
-#
+        #
         #    self.using_negation = True
 
         # Lists to store the found prime implicants and implicates
@@ -99,10 +99,10 @@ class PrimeCompilator:
         if isinstance(sub_formula, BiImpl):
             sub_formula = And(
                 Or(Not(sub_formula.f1), sub_formula.f2),
-                Or(Not(sub_formula.f2), sub_formula.f1)
+                Or(Not(sub_formula.f2), sub_formula.f1),
             )
 
-        if (isinstance(sub_formula, (And, Or))):
+        if isinstance(sub_formula, (And, Or)):
             sub_formula.f1 = self.__prepare_formula(sub_formula.f1)
             sub_formula.f2 = self.__prepare_formula(sub_formula.f2)
             return sub_formula
@@ -180,8 +180,7 @@ class PrimeCompilator:
         if isinstance(sub_formula, OnePlaced):
             return self.__find_atoms(sub_formula.f1)
 
-        return (self.__find_atoms(sub_formula.f1)
-                | (self.__find_atoms(sub_formula.f2)))
+        return self.__find_atoms(sub_formula.f1) | (self.__find_atoms(sub_formula.f2))
 
     def __number_of_complete_models(self, models):
         """Calculate the number of complete models from partial models.
@@ -198,8 +197,9 @@ class PrimeCompilator:
 
         """
         atoms = len(self.atoms)
-        return reduce(lambda a, b: a+b, [0]
-                      + [2**(atoms - len(model)) for model in models])
+        return reduce(
+            lambda a, b: a + b, [0] + [2 ** (atoms - len(model)) for model in models]
+        )
 
     def _all_models(self, formula):
         """Find and returns all models of the given formula.
@@ -220,11 +220,11 @@ class PrimeCompilator:
 
         new_models = sat(self.formula, self.atoms)
         for generated_model in new_models:
-                    # model_dict = dict()
+            # model_dict = dict()
             model = []
 
             for atom, truth in generated_model.items():
-                atom = ('+' if truth else '-') + atom
+                atom = ("+" if truth else "-") + atom
 
                 if atom not in mapping:
                     int_rep = len(mapping) + 1
@@ -250,34 +250,32 @@ class PrimeCompilator:
         # models = [list(model.items()) for model in models]
         # sets = self.__model_to_target_sets(models)
         hitting_sets = self.__hitting_sets(models)
-        hitting_sets = self.__remove_trivial_clauses(
-            hitting_sets, back_mapping)
+        hitting_sets = self.__remove_trivial_clauses(hitting_sets, back_mapping)
 
         # Generate prime implicates from the hitting sets (just type casting)
         for hitting_set in hitting_sets:
-            prime_implicate = self._hitting_set_to_assignment(
-                hitting_set, back_mapping)
+            prime_implicate = self._hitting_set_to_assignment(hitting_set, back_mapping)
             prime_implicates.append(prime_implicate)
 
         # Now take the hitting sets and find again all minimal hitting sets
         # Those then are all prime implicants
         hitting_sets = self.__hitting_sets(hitting_sets)
-        hitting_sets = self.__remove_trivial_clauses(
-            hitting_sets, back_mapping)
+        hitting_sets = self.__remove_trivial_clauses(hitting_sets, back_mapping)
         # Generate prime implicates from the hitting sets (just type casting)
         for hitting_set in hitting_sets:
-            prime_implicant = self._hitting_set_to_assignment(
-                hitting_set, back_mapping)
+            prime_implicant = self._hitting_set_to_assignment(hitting_set, back_mapping)
             prime_implicants.append(prime_implicant)
 
         # Flip implicants and implicates if necessary
         if self.using_negation:
-            actual_prime_implicants = [[(name, not truth)
-                                        for name, truth in prime_implicate]
-                                       for prime_implicate in prime_implicates]
-            actual_prime_implicates = [[(name, not truth)
-                                        for name, truth in prime_implicant]
-                                       for prime_implicant in prime_implicants]
+            actual_prime_implicants = [
+                [(name, not truth) for name, truth in prime_implicate]
+                for prime_implicate in prime_implicates
+            ]
+            actual_prime_implicates = [
+                [(name, not truth) for name, truth in prime_implicant]
+                for prime_implicant in prime_implicants
+            ]
 
             prime_implicates = actual_prime_implicates
             prime_implicants = actual_prime_implicants
