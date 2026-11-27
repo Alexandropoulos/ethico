@@ -15,7 +15,6 @@ from ethico.constants import (
     OPENAI_TOOLS,
     SYSTEM_PROMPT,
     TITLE_GENERATION_PROMPT,
-    TROLLEY_TEST_PROMPT,
 )
 from ethico.conversation_service import (
     AlreadyEvaluatedError,
@@ -48,7 +47,7 @@ load_dotenv()
 
 class State(rx.State):
     question: str = ""
-    chat_history: list[tuple[str, str]] = []
+    chat_history: list[tuple[str, str]] = []  
     processing: bool = False
     error: str = ""
     dilemma_json: str = ""
@@ -56,10 +55,8 @@ class State(rx.State):
     evaluated: bool = False
 
     conversation_id: str = ""
-    conversations: list[dict[str, str]] = []
+    conversations: list[dict[str, str]] = []  
 
-    # Incremented whenever chats or users change so an old stream cannot
-    # write into a different conversation.
     chat_generation: int = 0
 
     @rx.event
@@ -116,12 +113,14 @@ class State(rx.State):
             )
             # The saved dilemma belongs to the conversation, not its messages.
             record = await asyncio.to_thread(
-                lambda: client.table("conversations")
-                .select("dilemma,evaluation")
-                .eq("id", conversation_id)
-                .eq("user_id", user_id)
-                .single()
-                .execute()
+                lambda: (
+                    client.table("conversations")
+                    .select("dilemma,evaluation")
+                    .eq("id", conversation_id)
+                    .eq("user_id", user_id)
+                    .single()
+                    .execute()
+                )
             )
             if self.chat_generation != generation:
                 return

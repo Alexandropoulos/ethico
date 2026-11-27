@@ -1,12 +1,12 @@
 import reflex as rx
 
+from ethico import style
+from ethico.components import action_bar, chat, sidebar
 from ethico.state import State
-from ethico.components import chat, sidebar, action_bar
-from ethico import style    
 
 
 def index() -> rx.Component:
-        return rx.hstack(
+    return rx.hstack(
         sidebar(),
         rx.center(
             rx.vstack(
@@ -32,4 +32,3 @@ def index() -> rx.Component:
         ),
         **style.page_shell,
     )
-

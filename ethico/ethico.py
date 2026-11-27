@@ -1,10 +1,10 @@
 import reflex as rx
 
 from ethico.auth_state import AuthState
-from ethico.pages.dilemmas import dilemmas
-from ethico.pages.login import login
 from ethico.pages.about import about
+from ethico.pages.dilemmas import dilemmas
 from ethico.pages.index import index
+from ethico.pages.login import login
 
 app = rx.App()
 app.add_page(

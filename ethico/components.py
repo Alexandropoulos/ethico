@@ -1,14 +1,15 @@
+from collections.abc import Callable
+
 import reflex as rx
-from typing import Callable, Optional
 
 from ethico import style
-from ethico.state import State
-from ethico.constants import INTRO_MESSAGE
 from ethico.auth_state import AuthState
+from ethico.constants import INTRO_MESSAGE
+from ethico.state import State
 
 
 def sidebar_item(
-    text: str, icon: str, href: str, on_click: Optional[Callable] = None
+    text: str, icon: str, href: str, on_click: Callable | None = None
 ) -> rx.Component:
     return rx.link(
         rx.hstack(
@@ -66,9 +67,7 @@ def sidebar_conversations() -> rx.Component:
                             ),
                             **style.sidebar_conversation_title_scroll,
                         ),
-                        on_click=lambda: State.open_conversation(
-                            conversation["id"]
-                        ),  # type: ignore
+                        on_click=lambda: State.open_conversation(conversation["id"]),  # type: ignore
                         disabled=State.processing,
                         bg=rx.cond(
                             State.conversation_id == conversation["id"],

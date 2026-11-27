@@ -329,7 +329,9 @@ When you have gathered all necessary information, end your response by instructi
 </example_dilemmas>
 """
 
-TROLLEY_TEST_PROMPT = SYSTEM_PROMPT + """
+TROLLEY_TEST_PROMPT = (
+    SYSTEM_PROMPT
+    + """
 <testing_instructions>
 You are operating in a controlled testing mode.
 
@@ -398,6 +400,7 @@ behavior. Only the extracted dilemma model is fixed for testing.
 }
 </reference_dilemma>
 """
+)
 
 EXPLAIN_PROMPT = """The following is the output of a machine ethics evaluation of the moral dilemma we discussed.
 

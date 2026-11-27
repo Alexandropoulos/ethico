@@ -16,7 +16,7 @@ PAGE_SIZE = 500
 
 def _date_label(iso_date: str) -> str:
     try:
-        return datetime.fromisoformat(iso_date.replace("Z", "+00:00")).strftime(
+        return datetime.fromisoformat(iso_date).strftime(
             "%d %b %Y"
         )
     except (ValueError, AttributeError):

@@ -1,5 +1,6 @@
 import json
 import logging
+
 import reflex as rx
 
 from .database import create_supabase_client
@@ -143,7 +144,7 @@ class AuthState(rx.State):
                 return rx.redirect("/")
 
             self.auth_error = (
-                "Registration submitted. " "Check your email to confirm your account."
+                "Registration submitted. Check your email to confirm your account."
             )
 
         except Exception:

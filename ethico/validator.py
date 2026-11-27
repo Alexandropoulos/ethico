@@ -1,5 +1,4 @@
-from typing import Optional
-from pydantic import BaseModel, field_validator, ValidationInfo
+from pydantic import BaseModel, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -46,14 +45,14 @@ class KantianModel(BaseModel):
         consequences_negations = {
             f"Not('{consequence}')" for consequence in consequences
         }
-        valid_causes = (
+        (
             set(actions)
             | set(consequences)
             | actions_negations
             | consequences_negations
         )
 
-        for consequence, cause in mechanisms.items():
+        for consequence in mechanisms:
             if consequence not in consequences and not (
                 consequence.startswith("Not('") and consequence.endswith("')")
             ):
@@ -65,7 +64,7 @@ class KantianModel(BaseModel):
             negation = f"Not('{consequence}')"
             if consequence not in mechanisms and negation not in mechanisms:
                 raise ValueError(
-                    f"Each consequence must have a corresponding mechanism key or its negation."
+                    "Each consequence must have a corresponding mechanism key or its negation."
                 )
         return mechanisms
 
@@ -104,13 +103,13 @@ class KantianModel(BaseModel):
             for affect in affect_list:
                 if len(affect) != 2:
                     raise ValueError(
-                        f"Each affect entry must be a list of [patient, valence]."
+                        "Each affect entry must be a list of [patient, valence]."
                     )
                 patient, valence = affect
                 if patient not in patients:
                     raise ValueError(f"Affect patient '{patient}' must be a patient.")
                 if valence not in ["+", "-"]:
-                    raise ValueError(f"Affect valence must be '+' or '-'.")
+                    raise ValueError("Affect valence must be '+' or '-'.")
         return affects
 
 
@@ -142,10 +141,10 @@ class UtilitarianModel(BaseModel):
     def validate_mechanisms(
         cls, mechanisms: dict[str, str], info: ValidationInfo
     ) -> dict[str, str]:
-        actions = info.data["actions"]
+        info.data["actions"]
         consequences = info.data["consequences"]
 
-        for key in mechanisms.keys():
+        for key in mechanisms:
             if key not in consequences and not (
                 key.startswith("Not('") and key.endswith("')")
             ):
@@ -156,7 +155,7 @@ class UtilitarianModel(BaseModel):
             negation = f"Not('{consequence}')"
             if consequence not in mechanisms and negation not in mechanisms:
                 raise ValueError(
-                    f"Each consequence must have a corresponding mechanism key or its negation."
+                    "Each consequence must have a corresponding mechanism key or its negation."
                 )
         return mechanisms
 
@@ -182,7 +181,7 @@ class UtilitarianModel(BaseModel):
                 and f"Not('{consequence}')" not in utility_keys
             ):
                 raise ValueError(
-                    f"Each consequence or its negation must have a corresponding utility key."
+                    "Each consequence or its negation must have a corresponding utility key."
                 )
         return utilities
 
@@ -219,6 +218,6 @@ class UnifiedModel(KantianModel):
                 and f"Not('{consequence}')" not in utility_keys
             ):
                 raise ValueError(
-                    f"Each consequence or its negation must have a corresponding utility key."
+                    "Each consequence or its negation must have a corresponding utility key."
                 )
         return utilities

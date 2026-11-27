@@ -1,7 +1,8 @@
 import reflex as rx
-from ethico.constants import SYSTEM_INFORMATION
-from ethico.components import sidebar
+
 from ethico import style
+from ethico.components import sidebar
+from ethico.constants import SYSTEM_INFORMATION
 
 
 def about_content() -> rx.Component:
